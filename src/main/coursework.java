@@ -11,13 +11,13 @@ import javafx.stage.Stage;
 public class coursework extends Application {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		System.out.println("test");
-		
+
 		// créer un singleton Auctioneer
 			// créer un serveur
 		// créer une classe customer
 			// connexion au serveur via un client
+		
 		launch(args);
 	}
 
@@ -27,7 +27,6 @@ public class coursework extends Application {
 		Button btn = new Button();
 		btn.setText("Say 'Hello World'");
 		btn.setOnAction(new EventHandler<ActionEvent>() {
-
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Hello World!");
