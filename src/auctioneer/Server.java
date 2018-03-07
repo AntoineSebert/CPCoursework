@@ -1,4 +1,4 @@
-package Server;
+package auctioneer;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class coursework extends Application {
+public class Server extends Application {
 
 	public static void main(String[] args) {
 		System.out.println("test");
@@ -17,7 +17,7 @@ public class coursework extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle("Server");
+		primaryStage.setTitle("auctioneer");
 		Button btn = new Button();
 		btn.setText("Invoke Satan");
 		btn.setOnAction(new EventHandler<ActionEvent>() {
@@ -32,6 +32,5 @@ public class coursework extends Application {
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
 	}
-
 
 }
