@@ -1,4 +1,4 @@
-package main;
+package Server;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -12,24 +12,18 @@ public class coursework extends Application {
 
 	public static void main(String[] args) {
 		System.out.println("test");
-
-		// créer un singleton Auctioneer
-			// créer un serveur
-		// créer une classe customer
-			// connexion au serveur via un client
-		
 		launch(args);
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		primaryStage.setTitle("Hello World!");
+		primaryStage.setTitle("Server");
 		Button btn = new Button();
-		btn.setText("Say 'Hello World'");
+		btn.setText("Invoke Satan");
 		btn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Hello World!");
+				System.out.println("Gort ! Klaatu barada nikto !");
 			}
 		});
 		
@@ -38,4 +32,6 @@ public class coursework extends Application {
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
 	}
+
+
 }
