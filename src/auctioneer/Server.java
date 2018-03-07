@@ -1,5 +1,12 @@
 package auctioneer;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashSet;
+
+import customer.Client;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -9,10 +16,18 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server extends Application {
+	private HashSet<Client> clients; // order clients by bid, but check if no bids
+	private Date deadline;
+	private int statusBroadcastinterval;
+	private ServerStatus serverStatus;
 
 	public static void main(String[] args) {
-		System.out.println("test");
+		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+		System.out.println("DATETIME = " + utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		launch(args);
+		
+		// program loop
+			
 	}
 
 	@Override
@@ -31,6 +46,22 @@ public class Server extends Application {
 		root.getChildren().add(btn);
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
+	}
+	
+	private void broadcastProduct() {
+		
+	}
+	
+	private void broadcastStatus() {
+		
+	}
+	
+	private void broadcastWinningBid() {
+		
+	}
+	
+	private void sendStatus(Client receiver) {
+		
 	}
 
 }
