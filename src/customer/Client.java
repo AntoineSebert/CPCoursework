@@ -13,7 +13,12 @@ public class Client extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		
+		try {
+			
+		}
+		catch() {
+			
+		}
 	}
 	
 	private boolean connectToServer(Server server) {

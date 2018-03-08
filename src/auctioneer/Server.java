@@ -1,11 +1,14 @@
 package auctioneer;
 
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 
+import common.ServerProperties;
 import common.ServerStatus;
 import customer.Client;
 import javafx.application.Application;
@@ -28,7 +31,15 @@ public class Server extends Application {
 		System.out.println("DATETIME = " + utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		launch(args);
 		
-		// program loop
+		while(true) {
+			try {
+				ServerSocket serverSocket = new ServerSocket(ServerProperties.portNumber);
+				Socket clientSocket = serverSocket.accept();
+			}
+			catch() {
+				
+			}
+		}
 		
 	}
 
