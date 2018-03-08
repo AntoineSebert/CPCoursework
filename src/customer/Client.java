@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 
 public class Client extends Application {
 	private Date currentDate;
+	private String name;
+	private int id;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
