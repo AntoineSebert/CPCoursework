@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 
+import common.ServerStatus;
 import customer.Client;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 public class Server extends Application {
 	private HashSet<Client> clients; // order clients by bid, but check if no bids
 	private Date deadline;
+	private Date currentDate;
 	private int statusBroadcastinterval;
 	private ServerStatus serverStatus;
 
@@ -27,7 +29,7 @@ public class Server extends Application {
 		launch(args);
 		
 		// program loop
-			
+		
 	}
 
 	@Override
