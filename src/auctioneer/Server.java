@@ -2,12 +2,10 @@ package auctioneer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import common.ServerProperties;
+import common.Utility;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,13 +16,11 @@ import javafx.stage.Stage;
 
 public class Server extends Application implements AbstractServer {
 	private Date deadline;
-	private Date serverStartDate;
+	private String serverStartDate;
 	private int statusBroadcastinterval;
 	private ServerSocket serverSocket;
 
 	public void main(String[] args) {
-		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-		System.out.println("DATETIME = " + utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		launch(args);
 		
 		startServer();
@@ -58,6 +54,7 @@ public class Server extends Application implements AbstractServer {
 
 	@Override
 	public void startServer() {
+		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
 		}
@@ -68,30 +65,26 @@ public class Server extends Application implements AbstractServer {
 
 	@Override
 	public void stopServer() {
-		for(ClientImage client : clientsQueue) {
-			// envoyer à client message déconnexion
-			// déconnecter client
-			client.toString();
+		try {
+			for(ClientImage client : clientsQueue) {
+				// envoyer à client message déconnexion
+				// déconnecter client
+				client.toString();
+			}
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
-	private void broadcastProduct() {
-		
+	private void broadcast(String tag, Object data) {
+		for(ClientImage client : clientsQueue)
+			System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
 	
-	private void broadcastStatus() {
-		
+	private void send(ClientImage client, String tag, Object data) {
+		System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
 	
-	private void broadcastWinningBid() {
-		for(ClientImage client : clientsQueue) {
-			client.toString();
-		}
-	}
-	
-	private void sendStatus(ClientImage receiver) {
-		System.out.println(serverStatus);
-		receiver.toString();
-	}
 
 }
