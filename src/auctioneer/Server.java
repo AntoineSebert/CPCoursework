@@ -10,10 +10,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.HashSet;
 
 import common.ServerProperties;
-import common.ServerStatus;
 import customer.Client;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -23,17 +21,13 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Server extends Application {
-	static private HashSet<Client> clientsQueue; // order clients by bid, but check if no bids
-	static private Date deadline;
-	static private Date startDate;
-	static private Date currentDate;
-	static private Date serverStartDate;
-	static private int statusBroadcastinterval;
-	static private ServerStatus serverStatus;
-	static private ServerSocket serverSocket;
+public class Server extends Application implements AbstractServer {
+	private Date deadline;
+	private Date serverStartDate;
+	private int statusBroadcastinterval;
+	private ServerSocket serverSocket;
 
-	public static void main(String[] args) {
+	public void main(String[] args) {
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
 		System.out.println("DATETIME = " + utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		launch(args);
@@ -60,8 +54,9 @@ public class Server extends Application {
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
 	}
-	
-	private static void startServer() {
+
+	@Override
+	public void startServer() {
 		for(int i = 0; i < 20; i++) {
 			try {
 				serverSocket = new ServerSocket(ServerProperties.portNumber);
@@ -74,27 +69,29 @@ public class Server extends Application {
 			}
 		}
 	}
-	
-	private static void stopServer() {
+
+	@Override
+	public void stopServer() {
 		for(Client client : clientsQueue) {
-			//client.disconnect();
+			client.toString();
 		}
 	}
 	
-	private static void broadcastProduct() {
+	private void broadcastProduct() {
 		
 	}
 	
-	private static void broadcastStatus() {
+	private void broadcastStatus() {
 		
 	}
 	
-	private static void broadcastWinningBid() {
+	private void broadcastWinningBid() {
 		
 	}
 	
-	private static void sendStatus(Client receiver) {
-		
+	private void sendStatus(Client receiver) {
+		System.out.println(serverStatus);
+		receiver.toString();
 	}
 
 }
