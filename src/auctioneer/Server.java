@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Date;
 
+import common.Protocol;
 import common.ServerProperties;
 import common.Utility;
 import javafx.application.Application;
@@ -26,9 +27,7 @@ public class Server extends Application implements AbstractServer {
 		startServer();
 		
 		for (int i = 0; i < 20; i++) {
-			broadcastProduct();
-			broadcastStatus();
-			broadcastWinningBid();
+			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 		}
 		
 		stopServer();
@@ -77,14 +76,24 @@ public class Server extends Application implements AbstractServer {
 		}
 	}
 	
-	private void broadcast(String tag, Object data) {
+	private void broadcast(Protocol.serverTags tag, Object data) {
 		for(ClientImage client : clientsQueue)
 			System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
 	
-	private void send(ClientImage client, String tag, Object data) {
+	private void send(ClientImage client, Protocol.serverTags tag, Object data) {
 		System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
 	
+	private void receive() {
+		Protocol.clientTags test = Protocol.clientTags.BID_SUBMIT;
+		switch(test) {
+			case BID_SUBMIT:
+				System.out.println(test.toString() + " received");
+				break;
+			default:
+				break;
+		}
+	}
 
 }
