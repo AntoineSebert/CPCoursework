@@ -1,5 +1,8 @@
 package auctioneer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.ZoneOffset;
@@ -20,11 +23,12 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server extends Application {
-	private HashSet<Client> clients; // order clients by bid, but check if no bids
-	private Date deadline;
-	private Date currentDate;
-	private int statusBroadcastinterval;
-	private ServerStatus serverStatus;
+	static private HashSet<Client> clients; // order clients by bid, but check if no bids
+	static private Date deadline;
+	static private Date currentDate;
+	static private int statusBroadcastinterval;
+	static private ServerStatus serverStatus;
+	static private ServerSocket serverSocket;
 
 	public static void main(String[] args) {
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
@@ -33,10 +37,15 @@ public class Server extends Application {
 		
 		while(true) {
 			try {
-				ServerSocket serverSocket = new ServerSocket(ServerProperties.portNumber);
+				serverSocket = new ServerSocket(ServerProperties.portNumber);
 				Socket clientSocket = serverSocket.accept();
+				/*
+				 * PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+					BufferedReader in = new BufferedReader(
+					new InputStreamReader(clientSocket.getInputStream()));
+				 */
 			}
-			catch() {
+			catch(IOException e) {
 				
 			}
 		}
@@ -61,19 +70,19 @@ public class Server extends Application {
 		primaryStage.show();
 	}
 	
-	private void broadcastProduct() {
+	private static void broadcastProduct() {
 		
 	}
 	
-	private void broadcastStatus() {
+	private static void broadcastStatus() {
 		
 	}
 	
-	private void broadcastWinningBid() {
+	private static void broadcastWinningBid() {
 		
 	}
 	
-	private void sendStatus(Client receiver) {
+	private static void sendStatus(Client receiver) {
 		
 	}
 
