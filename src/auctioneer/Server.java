@@ -2,6 +2,7 @@ package auctioneer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,9 +24,11 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server extends Application {
-	static private HashSet<Client> clients; // order clients by bid, but check if no bids
+	static private HashSet<Client> clientsQueue; // order clients by bid, but check if no bids
 	static private Date deadline;
+	static private Date startDate;
 	static private Date currentDate;
+	static private Date serverStartDate;
 	static private int statusBroadcastinterval;
 	static private ServerStatus serverStatus;
 	static private ServerSocket serverSocket;
@@ -35,21 +38,9 @@ public class Server extends Application {
 		System.out.println("DATETIME = " + utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		launch(args);
 		
-		while(true) {
-			try {
-				serverSocket = new ServerSocket(ServerProperties.portNumber);
-				Socket clientSocket = serverSocket.accept();
-				/*
-				 * PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-					BufferedReader in = new BufferedReader(
-					new InputStreamReader(clientSocket.getInputStream()));
-				 */
-			}
-			catch(IOException e) {
-				
-			}
-		}
+		startServer();
 		
+		stopServer();
 	}
 
 	@Override
@@ -68,6 +59,26 @@ public class Server extends Application {
 		root.getChildren().add(btn);
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
+	}
+	
+	private static void startServer() {
+		for(int i = 0; i < 20; i++) {
+			try {
+				serverSocket = new ServerSocket(ServerProperties.portNumber);
+				Socket clientSocket = serverSocket.accept();
+				PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+				BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			}
+			catch(IOException e) {
+				
+			}
+		}
+	}
+	
+	private static void stopServer() {
+		for(Client client : clientsQueue) {
+			//client.disconnect();
+		}
 	}
 	
 	private static void broadcastProduct() {

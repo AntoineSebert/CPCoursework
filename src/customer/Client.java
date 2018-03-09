@@ -14,15 +14,17 @@ import javafx.stage.Stage;
 
 public class Client extends Application {
 	private Date currentDate;
+	private Date connectionDate;
 	private String name;
 	private int id;
+	Socket mySocket;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		try {
-			Socket kkSocket = new Socket("knockknockserver.example.com", ServerProperties.portNumber);
-			PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
+			mySocket = new Socket("knockknockserver.example.com", ServerProperties.portNumber);
+			PrintWriter out = new PrintWriter(mySocket.getOutputStream(), true);
+			BufferedReader in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 			/*
 			
 			KnockKnockProtocol kkp = new KnockKnockProtocol();
@@ -51,7 +53,12 @@ public class Client extends Application {
 	}
 	
 	private void disconnect() {
-		
+		try {
+			mySocket.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
