@@ -1,18 +1,13 @@
 package auctioneer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import common.ServerProperties;
-import customer.Client;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -33,6 +28,12 @@ public class Server extends Application implements AbstractServer {
 		launch(args);
 		
 		startServer();
+		
+		for (int i = 0; i < 20; i++) {
+			broadcastProduct();
+			broadcastStatus();
+			broadcastWinningBid();
+		}
 		
 		stopServer();
 	}
@@ -57,22 +58,19 @@ public class Server extends Application implements AbstractServer {
 
 	@Override
 	public void startServer() {
-		for(int i = 0; i < 20; i++) {
-			try {
-				serverSocket = new ServerSocket(ServerProperties.portNumber);
-				Socket clientSocket = serverSocket.accept();
-				PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			}
-			catch(IOException e) {
-				
-			}
+		try {
+			serverSocket = new ServerSocket(ServerProperties.portNumber);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void stopServer() {
-		for(Client client : clientsQueue) {
+		for(ClientImage client : clientsQueue) {
+			// envoyer à client message déconnexion
+			// déconnecter client
 			client.toString();
 		}
 	}
@@ -86,10 +84,12 @@ public class Server extends Application implements AbstractServer {
 	}
 	
 	private void broadcastWinningBid() {
-		
+		for(ClientImage client : clientsQueue) {
+			client.toString();
+		}
 	}
 	
-	private void sendStatus(Client receiver) {
+	private void sendStatus(ClientImage receiver) {
 		System.out.println(serverStatus);
 		receiver.toString();
 	}
