@@ -20,14 +20,18 @@ public class Server extends Application implements AbstractServer {
 	private String serverStartDate;
 	private int statusBroadcastinterval;
 	private ServerSocket serverSocket;
+	private String product = "test";
 
 	public void main(String[] args) {
 		launch(args);
 		
+		statusBroadcastinterval = 1;
 		startServer();
 		
 		for (int i = 0; i < 20; i++) {
 			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
+			send(clientsQueue.iterator().next(), Protocol.serverTags.PRODUCT_DESCRIPTION, product);
+			send(clientsQueue.iterator().next(), Protocol.serverTags.TIME_REMAINING, deadline);
 		}
 		
 		stopServer();

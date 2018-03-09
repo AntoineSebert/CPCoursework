@@ -13,24 +13,28 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Client extends Application {
-	private Date currentDate;
 	private Date connectionDate;
 	private String name;
 	private int id;
 	Socket mySocket;
+	PrintWriter out;
+	BufferedReader in;
 
+	public void main(String[] args) {
+		launch(args);
+		if(connectToServer(new Server())) {
+			sendBid(100);
+			disconnect();
+		}
+	}
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		try {
 			mySocket = new Socket("knockknockserver.example.com", ServerProperties.portNumber);
-			PrintWriter out = new PrintWriter(mySocket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
+			out = new PrintWriter(mySocket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 			/*
-			
-			KnockKnockProtocol kkp = new KnockKnockProtocol();
-			outputLine = kkp.processInput(null);
-			out.println(outputLine);
-
 			while ((inputLine = in.readLine()) != null) {
 				outputLine = kkp.processInput(inputLine);
 				out.println(outputLine);
@@ -40,11 +44,13 @@ public class Client extends Application {
 			*/
 		}
 		catch(IOException e) {
-			
+			e.printStackTrace();
 		}
 	}
 	
 	private boolean connectToServer(Server server) {
+		connectionDate = new Date();
+		System.out.println("Connection established on " + connectionDate);
 		return true;
 	}
 	
