@@ -5,9 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 
 import common.Protocol;
 import common.ServerProperties;
@@ -21,45 +20,40 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Server extends Application {
+public class Server /*extends Application*/ {
 	private static Date deadline;
 	private static String serverStartDate;
 	private static int statusBroadcastinterval;
 	private static String product = "test";
 	static PrintWriter out;
 	static BufferedReader in;
-	static HashSet<ClientImage> clientsQueue = new HashSet<ClientImage>(); // order clients by bid, but check if no bids
+	static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>(); // order clients by bid, but check if no bids
 	Date startDate = new Date();
 	Date currentDate = new Date();
 	static ServerStatus serverStatus = ServerStatus.STOPPED;
 	static ServerSocket serverSocket = null;
 
 	public static void main(String[] args) {
-		launch(args);
+		//launch(args);
 		statusBroadcastinterval = 1;
 
 		if (startServer()) {
-			for (int i = 0; i < 20; i++) {
-				broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
-				/*
-				send(clientsQueue.iterator().next(), Protocol.serverTags.PRODUCT_DESCRIPTION, product);
-				send(clientsQueue.iterator().next(), Protocol.serverTags.TIME_REMAINING, deadline);
-				*/
-				Socket clientSocket;
-				
-				try {
-					clientSocket = serverSocket.accept();
-					out = new PrintWriter(clientSocket.getOutputStream(), true);
-					in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
+			clientsQueue.add(new ClientImage());
+			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
+			try {
+				clientsQueue.get(0).socket = serverSocket.accept();
+				out = new PrintWriter(clientsQueue.get(0).socket.getOutputStream(), true);
+				in = new BufferedReader(new InputStreamReader(clientsQueue.get(0).socket.getInputStream()));
+				clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
+				clientsQueue.get(0).send(Protocol.serverTags.TIME_REMAINING, deadline);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
 			}
 			stopServer();
 		}
 	}
-
+/*
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("auctioneer");
@@ -77,7 +71,7 @@ public class Server extends Application {
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
 	}
-
+*/
 	public static boolean startServer() {
 		serverStartDate = Utility.getDate();
 		try {
@@ -99,6 +93,7 @@ public class Server extends Application {
 				client.toString();
 			}
 			serverSocket.close();
+			System.out.println("Server stopped");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -108,20 +103,4 @@ public class Server extends Application {
 		for(ClientImage client : clientsQueue)
 			System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
-	
-	private static void send(ClientImage client, Protocol.serverTags tag, Object data) {
-		System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
-	}
-	
-	private void receive() {
-		Protocol.clientTags test = Protocol.clientTags.BID_SUBMIT;
-		switch(test) {
-			case BID_SUBMIT:
-				System.out.println(test.toString() + " received");
-				break;
-			default:
-				break;
-		}
-	}
-
 }
