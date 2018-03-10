@@ -15,21 +15,13 @@ import javafx.stage.Stage;
 public class Client extends Application {
 	private Date connectionDate;
 	private String name;
-	private int id;
 	Socket mySocket;
 	PrintWriter out;
 	BufferedReader in;
 
 	public void main(String[] args) {
 		launch(args);
-		if(connectToServer(new Server())) {
-			sendBid(100);
-			disconnect();
-		}
-	}
-	
-	@Override
-	public void start(Stage primaryStage) throws Exception {
+		
 		try {
 			mySocket = new Socket("knockknockserver.example.com", ServerProperties.portNumber);
 			out = new PrintWriter(mySocket.getOutputStream(), true);
@@ -46,11 +38,22 @@ public class Client extends Application {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+		
+		if(connectToServer(new Server())) {
+			sendBid(100);
+			disconnect();
+		}
+	}
+	
+	@Override
+	public void start(Stage primaryStage) throws Exception {
 	}
 	
 	private boolean connectToServer(Server server) {
 		connectionDate = new Date();
+		System.out.println(name);
 		System.out.println("Connection established on " + connectionDate);
+		
 		return true;
 	}
 	

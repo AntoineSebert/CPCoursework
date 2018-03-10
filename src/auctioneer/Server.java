@@ -1,11 +1,17 @@
 package auctioneer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Date;
+import java.util.HashSet;
 
 import common.Protocol;
 import common.ServerProperties;
+import common.ServerStatus;
 import common.Utility;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -15,26 +21,43 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Server extends Application implements AbstractServer {
-	private Date deadline;
-	private String serverStartDate;
-	private int statusBroadcastinterval;
-	private ServerSocket serverSocket;
-	private String product = "test";
+public class Server extends Application {
+	private static Date deadline;
+	private static String serverStartDate;
+	private static int statusBroadcastinterval;
+	private static String product = "test";
+	static PrintWriter out;
+	static BufferedReader in;
+	static HashSet<ClientImage> clientsQueue = new HashSet<ClientImage>(); // order clients by bid, but check if no bids
+	Date startDate = new Date();
+	Date currentDate = new Date();
+	static ServerStatus serverStatus = ServerStatus.STOPPED;
+	static ServerSocket serverSocket = null;
 
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		launch(args);
-		
 		statusBroadcastinterval = 1;
-		startServer();
-		
-		for (int i = 0; i < 20; i++) {
-			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
-			send(clientsQueue.iterator().next(), Protocol.serverTags.PRODUCT_DESCRIPTION, product);
-			send(clientsQueue.iterator().next(), Protocol.serverTags.TIME_REMAINING, deadline);
+
+		if (startServer()) {
+			for (int i = 0; i < 20; i++) {
+				broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
+				/*
+				send(clientsQueue.iterator().next(), Protocol.serverTags.PRODUCT_DESCRIPTION, product);
+				send(clientsQueue.iterator().next(), Protocol.serverTags.TIME_REMAINING, deadline);
+				*/
+				Socket clientSocket;
+				
+				try {
+					clientSocket = serverSocket.accept();
+					out = new PrintWriter(clientSocket.getOutputStream(), true);
+					in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			stopServer();
 		}
-		
-		stopServer();
 	}
 
 	@Override
@@ -45,7 +68,7 @@ public class Server extends Application implements AbstractServer {
 		btn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Gort ! Klaatu barada nikto !");
+				System.out.println("Server started on " + serverStartDate);
 			}
 		});
 		
@@ -55,19 +78,20 @@ public class Server extends Application implements AbstractServer {
 		primaryStage.show();
 	}
 
-	@Override
-	public void startServer() {
+	public static boolean startServer() {
 		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
+			System.out.println("Server started");
+			return true;
 		}
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
-	@Override
-	public void stopServer() {
+	public static void stopServer() {
 		try {
 			for(ClientImage client : clientsQueue) {
 				// envoyer à client message déconnexion
@@ -80,12 +104,12 @@ public class Server extends Application implements AbstractServer {
 		}
 	}
 	
-	private void broadcast(Protocol.serverTags tag, Object data) {
+	private static void broadcast(Protocol.serverTags tag, Object data) {
 		for(ClientImage client : clientsQueue)
 			System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
 	
-	private void send(ClientImage client, Protocol.serverTags tag, Object data) {
+	private static void send(ClientImage client, Protocol.serverTags tag, Object data) {
 		System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
 	}
 	
