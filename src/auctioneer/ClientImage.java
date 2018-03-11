@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import common.Protocol;
+import common.Utility;
 
 public class ClientImage {
 	private PrintWriter out;
@@ -17,7 +18,7 @@ public class ClientImage {
 	public ClientImage(Socket newSocket, int id) {
 		this.id = id;
 		socket = newSocket;
-		System.out.println("Connexion established with client");
+		println("Connexion established with client ");
 		try {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -38,14 +39,14 @@ public class ClientImage {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
 			switch(tag) {
 				case BID_SUBMIT:
-					System.out.println("BID_SUBMIT received :" + in.readLine());
+					println("BID_SUBMIT received :" + in.readLine());
 					break;
 				case CLOSE_CONNECTION:
 					Server.removeClient(id);
-					System.out.println("Connection with client " + id + " closed");
+					println("Connection with client " + id + " closed");
 					break;
 				default:
-					System.out.println("Unknown instruction :" + tag + ", value :" + in.readLine());
+					println("Unknown instruction :" + tag + ", value :" + in.readLine());
 					break;
 			}
 		}
@@ -53,8 +54,12 @@ public class ClientImage {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public int getId() {
 		return id;
+	}
+
+	public void println(String data) {
+		Utility.println("[SERVER_" + id + "]>" + data);
 	}
 }

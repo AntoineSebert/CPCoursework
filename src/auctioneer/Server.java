@@ -57,7 +57,7 @@ public class Server /*extends Application*/ {
 		btn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Server started on " + serverStartDate);
+				println("Server started on " + serverStartDate);
 			}
 		});
 		
@@ -71,7 +71,7 @@ public class Server /*extends Application*/ {
 		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
-			Utility.println("Server started on " + serverStartDate);
+			println("Server started on " + serverStartDate);
 			return true;
 		}
 		catch(IOException e) {
@@ -84,12 +84,12 @@ public class Server /*extends Application*/ {
 	public static void stopServer() {
 		for(ClientImage client : clientsQueue) {
 			client.send(Protocol.serverTags.CLOSE_CONNECTION, null);
-			Utility.println("Closing connection with client " + client.getId());
+			println("Closing connection with client " + client.getId());
 			clientsQueue.remove(client);
 		}
 		try {
 			serverSocket.close();
-			Utility.println("Server stopped");
+			println("Server stopped");
 		}
 		catch(IOException e) {
 			e.printStackTrace();
@@ -103,5 +103,8 @@ public class Server /*extends Application*/ {
 	
 	public static void removeClient(int index) {
 		clientsQueue.remove(index);
+	}
+	public static void println(String data) {
+		Utility.println("[SERVER]>" + data);
 	}
 }

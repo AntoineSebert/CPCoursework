@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
 
-import auctioneer.Server;
 import common.ServerProperties;
 import javafx.application.Application;
 import javafx.stage.Stage;
