@@ -28,9 +28,9 @@ public class ClientImage {
 	}
 	
 	public void send(Protocol.serverTags tag, Object data) {
-		System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
+		//System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
 		out.println(tag);
-		out.println(data.toString());
+		out.println(data);
 	}
 	
 	public void receive() {

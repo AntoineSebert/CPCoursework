@@ -43,10 +43,9 @@ public class Server /*extends Application*/ {
 					e.printStackTrace();
 				}
 				broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
-				clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
-				break;
+				//break;
 			}
-			stopServer();
+			//stopServer();
 		}
 	}
 /*
@@ -83,12 +82,12 @@ public class Server /*extends Application*/ {
 	}
 
 	public static void stopServer() {
+		for(ClientImage client : clientsQueue) {
+			client.send(Protocol.serverTags.CLOSE_CONNECTION, null);
+			Utility.println("Closing connection with client " + client.getId());
+			clientsQueue.remove(client);
+		}
 		try {
-			for(ClientImage client : clientsQueue) {
-				client.send(Protocol.serverTags.CLOSE_CONNECTION, null);
-				Utility.println("Closing connection with client " + client.getId());
-				clientsQueue.remove(client);
-			}
 			serverSocket.close();
 			Utility.println("Server stopped");
 		}
@@ -105,5 +104,4 @@ public class Server /*extends Application*/ {
 	public static void removeClient(int index) {
 		clientsQueue.remove(index);
 	}
-	
 }

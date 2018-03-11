@@ -23,7 +23,6 @@ public class Client /*extends Application*/ {
 		//launch(args);
 		name = "client1";
 		try {
-			mySocket = new Socket("localhost", ServerProperties.portNumber);
 			out = new PrintWriter(mySocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 			/*
@@ -35,7 +34,7 @@ public class Client /*extends Application*/ {
 						break;
 			}
 			*/
-			if(connectToServer(new Server())) {
+			if(connectToServer()) {
 				sendBid(100);
 				disconnect();
 			}
@@ -50,10 +49,14 @@ public class Client /*extends Application*/ {
 	
 	}
 	*/
-	static private boolean connectToServer(Server server) {
+	static private boolean connectToServer() {
 		connectionDate = new Date();
+		try {
+			mySocket = new Socket("localhost", ServerProperties.portNumber);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		System.out.println("Connection established on " + connectionDate);
-		
 		return true;
 	}
 	
