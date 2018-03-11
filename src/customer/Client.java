@@ -12,22 +12,22 @@ import common.ServerProperties;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class Client extends Application {
-	private Date connectionDate;
-	private String name;
-	Socket mySocket;
-	PrintWriter out;
-	BufferedReader in;
+public class Client /*extends Application*/ {
+	static private Date connectionDate;
+	static private String name;
+	static private Socket mySocket;
+	static private PrintWriter out;
+	static private BufferedReader in;
 
-	public void main(String[] args) {
-		launch(args);
-		
+	public static void main(String[] args) {
+		//launch(args);
+		name = "client1";
 		try {
-			String inputLine, outputLine;
-			mySocket = new Socket("knockknockserver.example.com", ServerProperties.portNumber);
+			mySocket = new Socket("localhost", ServerProperties.portNumber);
 			out = new PrintWriter(mySocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 			/*
+			String inputLine, outputLine;
 			while ((inputLine = in.readLine()) != null) {
 				outputLine = kkp.processInput(inputLine);
 				out.println(outputLine);
@@ -35,22 +35,23 @@ public class Client extends Application {
 						break;
 			}
 			*/
+			
+			if(connectToServer(new Server())) {
+				sendBid(100);
+				disconnect();
+			}
 		}
 		catch(IOException e) {
 			e.printStackTrace();
 		}
-		
-		if(connectToServer(new Server())) {
-			sendBid(100);
-			disconnect();
-		}
 	}
-	
+	/*
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-	}
 	
-	private boolean connectToServer(Server server) {
+	}
+	*/
+	static private boolean connectToServer(Server server) {
 		connectionDate = new Date();
 		System.out.println(name);
 		System.out.println("Connection established on " + connectionDate);
@@ -58,11 +59,11 @@ public class Client extends Application {
 		return true;
 	}
 	
-	private void sendBid(int bid) {
+	static private void sendBid(int bid) {
 		
 	}
 	
-	private void disconnect() {
+	static private void disconnect() {
 		try {
 			mySocket.close();
 		}
@@ -70,5 +71,9 @@ public class Client extends Application {
 			e.printStackTrace();
 		}
 	}
-
+	/*
+	public void close() {
+		System.out.println("Test");
+	}
+	 */
 }

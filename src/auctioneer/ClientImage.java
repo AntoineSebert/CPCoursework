@@ -17,6 +17,7 @@ public class ClientImage {
 	public ClientImage(ServerSocket serverSocket) {
 		try {
 			socket = serverSocket.accept();
+			System.out.println("Connexion established with client");
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (IOException e) {
@@ -32,14 +33,17 @@ public class ClientImage {
 	
 	public void receive() {
 		try {
-			switch(Protocol.clientTags.valueOf(in.readLine())) {
+			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
+			switch(tag) {
 				case BID_SUBMIT:
 					System.out.println("BID_SUBMIT received :" + in.readLine());
 					break;
 				default:
+					System.out.println("Unknown instruction :" + tag + ", value :" + in.readLine());
 					break;
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

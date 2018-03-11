@@ -41,7 +41,6 @@ public class Server /*extends Application*/ {
 			clientsQueue.add(newClient);
 			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 			clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
-			clientsQueue.get(0).send(Protocol.serverTags.TIME_REMAINING, deadline);
 			stopServer();
 		}
 	}
