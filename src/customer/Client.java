@@ -23,6 +23,7 @@ public class Client extends Application {
 		launch(args);
 		
 		try {
+			String inputLine, outputLine;
 			mySocket = new Socket("knockknockserver.example.com", ServerProperties.portNumber);
 			out = new PrintWriter(mySocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));

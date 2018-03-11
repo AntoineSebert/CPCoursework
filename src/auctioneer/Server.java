@@ -2,7 +2,6 @@ package auctioneer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -38,18 +37,11 @@ public class Server /*extends Application*/ {
 		statusBroadcastinterval = 1;
 
 		if (startServer()) {
-			clientsQueue.add(new ClientImage());
+			ClientImage newClient = new ClientImage(serverSocket);
+			clientsQueue.add(newClient);
 			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
-			try {
-				clientsQueue.get(0).socket = serverSocket.accept();
-				out = new PrintWriter(clientsQueue.get(0).socket.getOutputStream(), true);
-				in = new BufferedReader(new InputStreamReader(clientsQueue.get(0).socket.getInputStream()));
-				clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
-				clientsQueue.get(0).send(Protocol.serverTags.TIME_REMAINING, deadline);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
+			clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
+			clientsQueue.get(0).send(Protocol.serverTags.TIME_REMAINING, deadline);
 			stopServer();
 		}
 	}
@@ -76,7 +68,7 @@ public class Server /*extends Application*/ {
 		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
-			System.out.println("Server started");
+			System.out.println("Server started on " + serverStartDate);
 			return true;
 		}
 		catch(IOException e) {
@@ -101,6 +93,6 @@ public class Server /*extends Application*/ {
 	
 	private static void broadcast(Protocol.serverTags tag, Object data) {
 		for(ClientImage client : clientsQueue)
-			System.out.println("Sending " + tag + data.toString() + " to " + client.toString());
+			client.send(tag, data);
 	}
 }
