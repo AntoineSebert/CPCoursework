@@ -18,13 +18,13 @@ public class ClientImage {
 		this.id = id;
 		socket = newSocket;
 		System.out.println("Connexion established with client");
-			try {
-				out = new PrintWriter(socket.getOutputStream(), true);
-				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			out = new PrintWriter(socket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void send(Protocol.serverTags tag, Object data) {
@@ -49,8 +49,12 @@ public class ClientImage {
 					break;
 			}
 		}
-		catch (IOException e) {
+		catch(IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public int getId() {
+		return id;
 	}
 }

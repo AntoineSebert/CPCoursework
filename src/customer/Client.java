@@ -35,7 +35,6 @@ public class Client /*extends Application*/ {
 						break;
 			}
 			*/
-			
 			if(connectToServer(new Server())) {
 				sendBid(100);
 				disconnect();
@@ -53,7 +52,6 @@ public class Client /*extends Application*/ {
 	*/
 	static private boolean connectToServer(Server server) {
 		connectionDate = new Date();
-		System.out.println(name);
 		System.out.println("Connection established on " + connectionDate);
 		
 		return true;
@@ -67,13 +65,8 @@ public class Client /*extends Application*/ {
 		try {
 			mySocket.close();
 		}
-		catch (IOException e) {
+		catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
-	/*
-	public void close() {
-		System.out.println("Test");
-	}
-	 */
 }

@@ -16,4 +16,11 @@ public abstract class Utility {
 		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
 		return utc.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
+	public static String getTime() {
+		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+		return utc.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+	}
+	private static void println(String data) {
+		System.out.println('[' + Utility.getTime() + ']' + data);
+	}
 }

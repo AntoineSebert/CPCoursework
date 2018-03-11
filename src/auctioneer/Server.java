@@ -39,7 +39,7 @@ public class Server /*extends Application*/ {
 					newClient = new ClientImage(serverSocket.accept(), clientsQueue.size());
 					clientsQueue.add(newClient);
 				}
-				catch (IOException e) {
+				catch(IOException e) {
 					e.printStackTrace();
 				}
 				broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
@@ -72,7 +72,7 @@ public class Server /*extends Application*/ {
 		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
-			System.out.println("Server started on " + serverStartDate);
+			Utility.println("Server started on " + serverStartDate);
 			return true;
 		}
 		catch(IOException e) {
@@ -85,14 +85,14 @@ public class Server /*extends Application*/ {
 	public static void stopServer() {
 		try {
 			for(ClientImage client : clientsQueue) {
-				// envoyer à client message déconnexion
-				// déconnecter client
-				client.toString();
+				client.send(Protocol.serverTags.CLOSE_CONNECTION, null);
+				Utility.println("Closing connection with client " + client.getId());
+				clientsQueue.remove(client);
 			}
 			serverSocket.close();
-			System.out.println("Server stopped");
+			Utility.println("Server stopped");
 		}
-		catch (IOException e) {
+		catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -105,4 +105,5 @@ public class Server /*extends Application*/ {
 	public static void removeClient(int index) {
 		clientsQueue.remove(index);
 	}
+	
 }
