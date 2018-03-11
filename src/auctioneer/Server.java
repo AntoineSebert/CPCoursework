@@ -1,8 +1,6 @@
 package auctioneer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,23 +22,30 @@ public class Server /*extends Application*/ {
 	private static String serverStartDate;
 	private static int statusBroadcastinterval;
 	private static String product = "test";
-	static PrintWriter out;
-	static BufferedReader in;
 	static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>(); // order clients by bid, but check if no bids
-	Date startDate = new Date();
-	Date currentDate = new Date();
+	private Date startDate = null;
 	static ServerStatus serverStatus = ServerStatus.STOPPED;
 	static ServerSocket serverSocket = null;
 
 	public static void main(String[] args) {
 		//launch(args);
 		statusBroadcastinterval = 1;
-
 		if (startServer()) {
-			ClientImage newClient = new ClientImage(serverSocket);
-			clientsQueue.add(newClient);
-			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
-			clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
+			while (true) {
+				// accept a connection
+				// create a thread to deal with the client
+				try {
+					ClientImage newClient;
+					newClient = new ClientImage(serverSocket.accept(), clientsQueue.size());
+					clientsQueue.add(newClient);
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
+				clientsQueue.get(0).send(Protocol.serverTags.PRODUCT_DESCRIPTION, product);
+				break;
+			}
 			stopServer();
 		}
 	}
@@ -71,6 +76,7 @@ public class Server /*extends Application*/ {
 			return true;
 		}
 		catch(IOException e) {
+			stopServer();
 			e.printStackTrace();
 		}
 		return false;
@@ -85,7 +91,8 @@ public class Server /*extends Application*/ {
 			}
 			serverSocket.close();
 			System.out.println("Server stopped");
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -93,5 +100,9 @@ public class Server /*extends Application*/ {
 	private static void broadcast(Protocol.serverTags tag, Object data) {
 		for(ClientImage client : clientsQueue)
 			client.send(tag, data);
+	}
+	
+	public static void removeClient(int index) {
+		clientsQueue.remove(index);
 	}
 }

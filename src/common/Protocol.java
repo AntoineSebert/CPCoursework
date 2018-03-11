@@ -7,10 +7,12 @@ public class Protocol {
 		TIME_REMAINING,
 		HIGHEST_UPDATE,
 		CLOSE_BIDDING,
-		WINNING_BID
+		WINNING_BID,
+		CLOSE_CONNECTION
 	}
 	
 	public static enum clientTags {
-		BID_SUBMIT
+		BID_SUBMIT,
+		CLOSE_CONNECTION
 	}
 }
