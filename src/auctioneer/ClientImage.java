@@ -26,10 +26,11 @@ public class ClientImage {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+		receive();
 	}
 	
 	public void send(Protocol.serverTags tag, Object data) {
-		//System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
+		System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
 		out.println(tag);
 		out.println(data);
 	}
@@ -37,6 +38,7 @@ public class ClientImage {
 	public void receive() {
 		try {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
+			println("test");
 			switch(tag) {
 				case BID_SUBMIT:
 					println("BID_SUBMIT received :" + in.readLine());
@@ -60,6 +62,6 @@ public class ClientImage {
 	}
 
 	public void println(String data) {
-		Utility.println("[SERVER_" + id + "]>" + data);
+		Utility.println("[SERVER_" + id + "]> " + data);
 	}
 }

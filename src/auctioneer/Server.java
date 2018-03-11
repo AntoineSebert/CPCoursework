@@ -35,14 +35,12 @@ public class Server /*extends Application*/ {
 				// accept a connection
 				// create a thread to deal with the client
 				try {
-					ClientImage newClient;
-					newClient = new ClientImage(serverSocket.accept(), clientsQueue.size());
-					clientsQueue.add(newClient);
+					clientsQueue.add(new ClientImage(serverSocket.accept(), clientsQueue.size()));
+					broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 				}
 				catch(IOException e) {
 					e.printStackTrace();
 				}
-				broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 				//break;
 			}
 			//stopServer();
@@ -104,7 +102,8 @@ public class Server /*extends Application*/ {
 	public static void removeClient(int index) {
 		clientsQueue.remove(index);
 	}
+
 	public static void println(String data) {
-		Utility.println("[SERVER]>" + data);
+		Utility.println("[SERVER]> " + data);
 	}
 }
