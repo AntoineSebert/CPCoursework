@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
 
-import auctioneer.Server;
 import common.Protocol;
 import common.ServerProperties;
 import common.Utility;
@@ -16,11 +15,11 @@ import javafx.stage.Stage;
 
 public class Client /*extends Application*/ {
 	private static Date connectionDate;
-	private static Socket mySocket;
 	private static PrintWriter out;
 	private static BufferedReader in;
 	// static private current highest bid + client id
 	static private int id;
+	static Socket mySocket = null;
 
 	public static void main(String[] args) {
 		//launch(args);

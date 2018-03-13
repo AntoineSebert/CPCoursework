@@ -17,7 +17,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Server /*extends Application*/ implements AbstractServer {
+public class Server /*extends Application*/ {
+	private static String serverStartDate = Utility.getDate();
+	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
 	private static Date deadline;
 	private static int statusBroadcastInterval = 1;
 	private static String product = "test";
