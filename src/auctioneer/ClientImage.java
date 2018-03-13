@@ -10,12 +10,14 @@ import common.Protocol;
 import common.Utility;
 
 public class ClientImage {
+	static public int totalClients = 0;
 	private PrintWriter out;
 	private BufferedReader in;
 	private Socket socket;
 	private int id;
 	
 	public ClientImage(Socket newSocket, int id) {
+		totalClients++;
 		this.id = id;
 		socket = newSocket;
 		println("Connexion established with client ");

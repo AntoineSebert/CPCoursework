@@ -25,8 +25,7 @@ public class Client /*extends Application*/ {
 	public static void main(String[] args) {
 		//launch(args);
 		if(connectToServer()) {
-			Object bid[] = { 100 };
-			send(Protocol.clientTags.BID_SUBMIT, bid);
+			send(Protocol.clientTags.BID_SUBMIT, new Object[] { 100 });
 			receive();
 			disconnect();
 		}

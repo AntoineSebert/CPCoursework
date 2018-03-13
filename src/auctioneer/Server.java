@@ -35,9 +35,8 @@ public class Server /*extends Application*/ {
 				// accept a connection
 				// create a thread to deal with the client
 				try {
-					clientsQueue.add(new ClientImage(serverSocket.accept(), clientsQueue.size()/* refaire, id non unique */));
-					Object status[] = { serverStatus };
-					broadcast(Protocol.serverTags.SERVER_STATUS, status);
+					clientsQueue.add(new ClientImage(serverSocket.accept(), ClientImage.totalClients));
+					broadcast(Protocol.serverTags.SERVER_STATUS, new Object[]{ serverStatus });
 				}
 				catch(IOException e) {
 					e.printStackTrace();
