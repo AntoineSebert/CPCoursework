@@ -35,8 +35,9 @@ public class Server /*extends Application*/ {
 				// accept a connection
 				// create a thread to deal with the client
 				try {
-					clientsQueue.add(new ClientImage(serverSocket.accept(), clientsQueue.size()));
-					broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
+					clientsQueue.add(new ClientImage(serverSocket.accept(), clientsQueue.size()/* refaire, id non unique */));
+					Object status[] = { serverStatus };
+					broadcast(Protocol.serverTags.SERVER_STATUS, status);
 				}
 				catch(IOException e) {
 					e.printStackTrace();
@@ -94,13 +95,13 @@ public class Server /*extends Application*/ {
 		}
 	}
 	
-	private static void broadcast(Protocol.serverTags tag, Object data) {
+	private static void broadcast(Protocol.serverTags tag, Object data[]) {
 		for(ClientImage client : clientsQueue)
 			client.send(tag, data);
 	}
 	
-	public static void removeClient(int index) {
-		clientsQueue.remove(index);
+	public static void removeClient(ClientImage client) {
+		clientsQueue.remove(client);
 	}
 
 	public static void println(String data) {

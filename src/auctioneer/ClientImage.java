@@ -29,7 +29,7 @@ public class ClientImage {
 		receive();
 	}
 	
-	public void send(Protocol.serverTags tag, Object data) {
+	public void send(Protocol.serverTags tag, Object data[]) {
 		System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
 		out.println(tag);
 		out.println(data);
@@ -43,7 +43,7 @@ public class ClientImage {
 					println("BID_SUBMIT received :" + in.readLine());
 					break;
 				case CLOSE_CONNECTION:
-					Server.removeClient(id);
+					Server.removeClient(this);
 					println("Connection with client " + id + " closed");
 					break;
 				default:

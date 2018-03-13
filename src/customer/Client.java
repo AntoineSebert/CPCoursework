@@ -19,11 +19,15 @@ public class Client /*extends Application*/ {
 	static private Socket mySocket;
 	static private PrintWriter out;
 	static private BufferedReader in;
+	// static private current highest bid + client id
+	static private int id;
 
 	public static void main(String[] args) {
 		//launch(args);
 		if(connectToServer()) {
-			send(Protocol.clientTags.BID_SUBMIT, 100);
+			Object bid[] = { 100 };
+			send(Protocol.clientTags.BID_SUBMIT, bid);
+			receive();
 			disconnect();
 		}
 	}
@@ -37,17 +41,15 @@ public class Client /*extends Application*/ {
 		connectionDate = new Date();
 		try {
 			mySocket = new Socket("localhost", ServerProperties.portNumber);
+			println("Connection established on" + connectionDate);
 			out = new PrintWriter(mySocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
+			return true;
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		println("Connection established on" + connectionDate);
-		
-		// receive
-		
-		return true;
+		return false;
 	}
 	
 	static private void disconnect() {
@@ -60,7 +62,7 @@ public class Client /*extends Application*/ {
 		}
 	}
 	
-	public static void send(Protocol.clientTags tag, Object data) {
+	public static void send(Protocol.clientTags tag, Object data[]) {
 		System.out.println("Sending " + tag + ' ' + data.toString() + " to server");
 		out.println(tag);
 		out.println(data);
@@ -74,7 +76,7 @@ public class Client /*extends Application*/ {
 					println("Server status is " + in.readLine());
 					break;
 				case PRODUCT_DESCRIPTION:
-					println("");
+					println("The product is " + in.readLine());
 					break;
 				case TIME_REMAINING:
 					println("Time remaining : " + in.readLine());
@@ -86,7 +88,7 @@ public class Client /*extends Application*/ {
 					println("The auction has been closed");
 					break;
 				case NOT_HIGHER:
-					println("The auction has been closed");
+					println("The bid must be higher than the current highest bid");
 					break;
 				case WINNING_BID:
 					println("The winning bid is" + in.readLine());
