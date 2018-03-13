@@ -15,19 +15,19 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Client /*extends Application*/ {
-	static private Date connectionDate;
-	static private Socket mySocket;
-	static private PrintWriter out;
-	static private BufferedReader in;
+	private static Date connectionDate;
+	private static Socket mySocket;
+	private static PrintWriter out;
+	private static BufferedReader in;
 	// static private current highest bid + client id
 	static private int id;
 
 	public static void main(String[] args) {
 		//launch(args);
-		if(connectToServer()) {
+		if(start()) {
 			send(Protocol.clientTags.BID_SUBMIT, new Object[] { 100 });
 			receive();
-			disconnect();
+			stop();
 		}
 	}
 	/*
@@ -36,7 +36,7 @@ public class Client /*extends Application*/ {
 	
 	}
 	*/
-	static private boolean connectToServer() {
+	static private boolean start() {
 		connectionDate = new Date();
 		try {
 			mySocket = new Socket("localhost", ServerProperties.portNumber);
@@ -51,7 +51,7 @@ public class Client /*extends Application*/ {
 		return false;
 	}
 	
-	static private void disconnect() {
+	static private void stop() {
 		try {
 			out.println(Protocol.clientTags.CLOSE_CONNECTION);
 			mySocket.close();
@@ -94,7 +94,7 @@ public class Client /*extends Application*/ {
 					break;
 				case CLOSE_CONNECTION:
 					println("Closing connection with the server...");
-					disconnect();
+					stop();
 					break;
 				default:
 					println("Unknown instruction :" + tag + ", value :" + in.readLine());

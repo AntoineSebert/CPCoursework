@@ -18,22 +18,22 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server /*extends Application*/ {
-	static Server instance = null;
+	private static Server instance = null;
 	
 	private static Date deadline;
 	private static String serverStartDate;
 	private static int statusBroadcastinterval;
 	private static String product = "test";
-	static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>(); // order clients by bid, but check if no bids
-	private Date startDate = null;
-	static ServerStatus serverStatus = ServerStatus.STOPPED;
-	static ServerSocket serverSocket = null;
+	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>(); // order clients by bid, but check if no bids
+	private static Date startDate = null;
+	private static ServerStatus serverStatus = ServerStatus.STOPPED;
+	private static ServerSocket serverSocket = null;
 
 	public static void main(String[] args) {
 		//if (instance)
 		//launch(args);
 		statusBroadcastinterval = 1;
-		if (startServer()) {
+		if (start()) {
 			while (true) {
 				// accept a connection
 				// create a thread to deal with the client
@@ -46,7 +46,7 @@ public class Server /*extends Application*/ {
 				}
 				//break;
 			}
-			//stopServer();
+			//stop();
 		}
 	}
 /*
@@ -68,7 +68,7 @@ public class Server /*extends Application*/ {
 		primaryStage.show();
 	}
 */
-	protected static boolean startServer() {
+	protected static boolean start() {
 		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
@@ -76,13 +76,13 @@ public class Server /*extends Application*/ {
 			return true;
 		}
 		catch(IOException e) {
-			stopServer();
+			stop();
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	public static void stopServer() {
+	public static void stop() {
 		for(ClientImage client : clientsQueue) {
 			client.send(Protocol.serverTags.CLOSE_CONNECTION, null);
 			println("Closing connection with client " + client.getId());

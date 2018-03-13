@@ -1,5 +1,7 @@
 package auctioneer;
 
-public interface AbstractServer {
+import common.NetworkNode;
 
+public interface AbstractServer extends NetworkNode {
+	
 }
