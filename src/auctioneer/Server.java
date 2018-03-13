@@ -17,22 +17,16 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Server /*extends Application*/ {
-	private static Server instance = null;
-	
+public class Server /*extends Application*/ implements AbstractServer {
 	private static Date deadline;
-	private static String serverStartDate;
-	private static int statusBroadcastinterval;
+	private static int statusBroadcastInterval = 1;
 	private static String product = "test";
-	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>(); // order clients by bid, but check if no bids
 	private static Date startDate = null;
 	private static ServerStatus serverStatus = ServerStatus.STOPPED;
 	private static ServerSocket serverSocket = null;
 
 	public static void main(String[] args) {
-		//if (instance)
 		//launch(args);
-		statusBroadcastinterval = 1;
 		if (start()) {
 			while (true) {
 				// accept a connection
@@ -69,10 +63,10 @@ public class Server /*extends Application*/ {
 	}
 */
 	protected static boolean start() {
-		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
 			println("Server started on " + serverStartDate);
+			serverStatus = ServerStatus.RUNNING;
 			return true;
 		}
 		catch(IOException e) {
