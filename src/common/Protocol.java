@@ -1,6 +1,7 @@
 package common;
 
 public class Protocol {
+	// ajouter attribution id
 	public static enum serverTags {
 		// server status
 		SERVER_STATUS,
@@ -20,6 +21,7 @@ public class Protocol {
 		CLOSE_CONNECTION
 	}
 	
+	// ajouter ask_id, ask_desc, ask_highest, ask_remaining
 	public static enum clientTags {
 		// submitting a new bid
 		BID_SUBMIT,

@@ -18,6 +18,8 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server /*extends Application*/ {
+	static Server instance = null;
+	
 	private static Date deadline;
 	private static String serverStartDate;
 	private static int statusBroadcastinterval;
@@ -28,6 +30,7 @@ public class Server /*extends Application*/ {
 	static ServerSocket serverSocket = null;
 
 	public static void main(String[] args) {
+		//if (instance)
 		//launch(args);
 		statusBroadcastinterval = 1;
 		if (startServer()) {
@@ -65,7 +68,7 @@ public class Server /*extends Application*/ {
 		primaryStage.show();
 	}
 */
-	public static boolean startServer() {
+	protected static boolean startServer() {
 		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
