@@ -38,7 +38,6 @@ public class ClientImage {
 	public void receive() {
 		try {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
-			println("test");
 			switch(tag) {
 				case BID_SUBMIT:
 					println("BID_SUBMIT received :" + in.readLine());
