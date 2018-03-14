@@ -3,8 +3,8 @@ package auctioneer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Date;
 
+import common.Auction;
 import common.Protocol;
 import common.ServerProperties;
 import common.ServerStatus;
@@ -22,11 +22,9 @@ public class Server extends Application {
 	private static ServerStatus serverStatus = ServerStatus.STOPPED;
 	private static ServerSocket serverSocket;
 	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
-
-	private static Date startDate;
-	private static int statusBroadcastInterval = 1;
-	private static String product;
-	private static Date deadline;
+	private static Auction currentAuction;
+	private static ArrayList<Auction> auctionHistory = new ArrayList<Auction>();
+	private int statusBroadcastInterval = 1;
 
 	public static void main(String[] args) {
 		//launch(args);
@@ -68,7 +66,7 @@ public class Server extends Application {
 	}
 	
 	protected static boolean start() {
-		serverStartDate = Utility.getDate();
+		serverStartDate = Utility.getStringDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
 			println("Server started on " + serverStartDate);
@@ -110,7 +108,9 @@ public class Server extends Application {
 		Utility.println("[SERVER]> " + data);
 	}
 	
-	public static void beginAuction(String productName, int initialPrice) {
+	public static void beginAuction() {
+		if (currentAuction != null)
+			auctionHistory.add(currentAuction);
 		
 	}
 }
