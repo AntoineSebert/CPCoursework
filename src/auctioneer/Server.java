@@ -117,12 +117,24 @@ public class Server extends Application {
 		ZonedDateTime start = ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss"));
 		ZonedDateTime deadline = ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss"));		
 		currentAuction = new Auction(start, deadline,"Memories of Green", "A beautiful music from Blade Runner", 1982);
+		
 		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, new Object[]{
 				currentAuction.getProductName(),
 				currentAuction.getProductDescription(), currentAuction.getInitialPrice()
 		});
+		
 		broadcast(Protocol.serverTags.TIME_REMAINING, new Object[] {
 				Utility.difference(Utility.getDate(), currentAuction.getDeadline())
 		});
 	}
+	
+	public static void addBid(ClientImage client, int amount) {
+		if (amount < currentAuction.getHighestBid().getKey())
+			clientsQueue.get(clientsQueue.indexOf(client)).send(Protocol.serverTags.ERROR, new Object[] {
+					"The bid must be higher than the actual highest bid."
+			});
+			// send ERROR
+		currentAuction.addBid(client.getId(), amount);
+	}
+	
 }

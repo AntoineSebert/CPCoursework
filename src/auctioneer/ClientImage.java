@@ -42,7 +42,9 @@ public class ClientImage {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
 			switch(tag) {
 				case BID_SUBMIT:
-					println("BID_SUBMIT received :" + in.readLine());
+					String amountString = in.readLine();
+					println("BID_SUBMIT received :" + amountString);
+					Server.addBid(this, Integer.parseInt(amountString));
 					break;
 				case CLOSE_CONNECTION:
 					Server.removeClient(this);
