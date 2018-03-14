@@ -50,6 +50,9 @@ public class ClientImage {
 					Server.removeClient(this);
 					println("Connection with client " + id + " closed");
 					break;
+				case ERROR:
+					println("Error : " + in.readLine());
+					break;
 				default:
 					println("Unknown instruction :" + tag + ", value :" + in.readLine());
 					break;

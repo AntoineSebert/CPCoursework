@@ -95,6 +95,9 @@ public class Client extends Application {
 					println("Closing connection with the server...");
 					mySocket.close();
 					break;
+				case ERROR:
+					println("Error : " + in.readLine());
+					break;
 				default:
 					println("Unknown instruction :" + tag + ", value :" + in.readLine());
 					break;

@@ -18,7 +18,9 @@ public class Protocol {
 		// bid that have won the auction
 		WINNING_BID,
 		// closing connection with the client
-		CLOSE_CONNECTION
+		CLOSE_CONNECTION,
+		// generic error
+		ERROR
 	}
 	
 	// ajouter ask_id, ask_desc, ask_highest, ask_remaining
@@ -26,6 +28,8 @@ public class Protocol {
 		// submitting a new bid
 		BID_SUBMIT,
 		// closing connection with the server
-		CLOSE_CONNECTION
+		CLOSE_CONNECTION,
+		// generic error
+		ERROR
 	}
 }
