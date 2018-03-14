@@ -17,15 +17,16 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Server /*extends Application*/ {
-	private static String serverStartDate = Utility.getDate();
-	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
-	private static Date deadline;
-	private static int statusBroadcastInterval = 1;
-	private static String product = "test";
-	private static Date startDate = null;
+public class Server extends Application {
+	private static String serverStartDate;
 	private static ServerStatus serverStatus = ServerStatus.STOPPED;
-	private static ServerSocket serverSocket = null;
+	private static ServerSocket serverSocket;
+	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
+
+	private static Date startDate;
+	private static int statusBroadcastInterval = 1;
+	private static String product;
+	private static Date deadline;
 
 	public static void main(String[] args) {
 		//launch(args);
@@ -45,9 +46,10 @@ public class Server /*extends Application*/ {
 			//stop();
 		}
 	}
-/*
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		/*
 		primaryStage.setTitle("auctioneer");
 		Button btn = new Button();
 		btn.setText("Invoke Satan");
@@ -62,9 +64,11 @@ public class Server /*extends Application*/ {
 		root.getChildren().add(btn);
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
+		 */
 	}
-*/
+	
 	protected static boolean start() {
+		serverStartDate = Utility.getDate();
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
 			println("Server started on " + serverStartDate);
@@ -72,13 +76,13 @@ public class Server /*extends Application*/ {
 			return true;
 		}
 		catch(IOException e) {
-			stop();
+			stopServer();
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	public static void stop() {
+	public static void stopServer() {
 		for(ClientImage client : clientsQueue) {
 			client.send(Protocol.serverTags.CLOSE_CONNECTION, null);
 			println("Closing connection with client " + client.getId());
@@ -104,5 +108,9 @@ public class Server /*extends Application*/ {
 
 	public static void println(String data) {
 		Utility.println("[SERVER]> " + data);
+	}
+	
+	public static void beginAuction(String productName, int initialPrice) {
+		
 	}
 }

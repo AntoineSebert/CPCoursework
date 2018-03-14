@@ -13,28 +13,28 @@ import common.Utility;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class Client /*extends Application*/ {
+public class Client extends Application {
 	private static Date connectionDate;
 	private static PrintWriter out;
 	private static BufferedReader in;
 	// static private current highest bid + client id
 	static private int id;
-	static Socket mySocket = null;
+	static Socket mySocket;
 
 	public static void main(String[] args) {
 		//launch(args);
 		if(start()) {
 			send(Protocol.clientTags.BID_SUBMIT, new Object[] { 100 });
 			receive();
-			stop();
+			stopClient();
 		}
 	}
-	/*
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 	
 	}
-	*/
+
 	static private boolean start() {
 		connectionDate = new Date();
 		try {
@@ -50,7 +50,7 @@ public class Client /*extends Application*/ {
 		return false;
 	}
 	
-	static private void stop() {
+	private static void stopClient() {
 		try {
 			out.println(Protocol.clientTags.CLOSE_CONNECTION);
 			mySocket.close();
@@ -93,7 +93,7 @@ public class Client /*extends Application*/ {
 					break;
 				case CLOSE_CONNECTION:
 					println("Closing connection with the server...");
-					stop();
+					mySocket.close();
 					break;
 				default:
 					println("Unknown instruction :" + tag + ", value :" + in.readLine());
