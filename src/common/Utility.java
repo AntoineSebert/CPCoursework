@@ -25,8 +25,8 @@ public abstract class Utility {
 	public static void println(String data) {
 		System.out.println('[' + Utility.getStringTime() + "]" + data);
 	}
-	public static Date getDate() {
-		return Date.from(java.time.ZonedDateTime.now(ZoneOffset.UTC).toInstant());
+	public static ZonedDateTime getDate() {
+		return java.time.ZonedDateTime.now(ZoneOffset.UTC);
 	}
 	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
 		long diffInMillies = date2.getTime() - date1.getTime();
@@ -35,5 +35,8 @@ public abstract class Utility {
 	public static int compareDates(ZonedDateTime first, ZonedDateTime second) {
 		Comparator<ZonedDateTime> comparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
 		return comparator.compare(first, second);
+	}
+	public static ZonedDateTime difference(ZonedDateTime first, ZonedDateTime second) {
+		return;
 	}
 }

@@ -5,7 +5,7 @@ public class Protocol {
 	public static enum serverTags {
 		// server status
 		SERVER_STATUS,
-		// description of a production (name, price, description)
+		// description of a production (name, description, price)
 		PRODUCT_DESCRIPTION,
 		// time remaining
 		TIME_REMAINING,

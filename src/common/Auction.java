@@ -4,8 +4,6 @@
 package common;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -18,19 +16,22 @@ public class Auction {
 	private ZonedDateTime start;
 	private ZonedDateTime deadline;
 	private String productName;
+	private String productDescription;
 	private int initialPrice;
 	private NavigableMap<Integer, Integer> bids = new TreeMap<Integer, Integer>();
 
-	public Auction(ZonedDateTime start, ZonedDateTime deadline, String productName, int initialPrice) {
+	public Auction(ZonedDateTime start, ZonedDateTime deadline, String productName, String productDescription, int initialPrice) {
 		this.start = start;
 		this.deadline = deadline;
 		this.productName = productName;
+		this.productDescription = productDescription;
 		this.initialPrice = initialPrice;
 	}
 	
 	public ZonedDateTime getStart() { return start; }
 	public ZonedDateTime getDeadline() { return deadline; }
 	public String getProductName() { return productName; }
+	public String getProductDescription() { return productDescription; }
 	public int getInitialPrice() { return initialPrice; }
 
 	public Map.Entry<Integer, Integer> getHighestBid() { return bids.lastEntry(); }
