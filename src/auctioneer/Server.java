@@ -2,6 +2,8 @@ package auctioneer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import common.Auction;
@@ -111,6 +113,10 @@ public class Server extends Application {
 	public static void beginAuction() {
 		if (currentAuction != null)
 			auctionHistory.add(currentAuction);
+
+		ZonedDateTime start = ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss"));
+		ZonedDateTime deadline = ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss"));
 		
+		currentAuction = new Auction(start, deadline,"Memories of Green", 1982);
 	}
 }

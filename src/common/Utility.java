@@ -6,7 +6,10 @@ package common;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author i
@@ -24,5 +27,13 @@ public abstract class Utility {
 	}
 	public static Date getDate() {
 		return Date.from(java.time.ZonedDateTime.now(ZoneOffset.UTC).toInstant());
+	}
+	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+		long diffInMillies = date2.getTime() - date1.getTime();
+		return timeUnit.convert(diffInMillies, timeUnit);
+	}
+	public static int compareDates(ZonedDateTime first, ZonedDateTime second) {
+		Comparator<ZonedDateTime> comparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
+		return comparator.compare(first, second);
 	}
 }
