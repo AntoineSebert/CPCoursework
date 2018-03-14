@@ -3,6 +3,7 @@
  */
 package common;
 
+import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +37,7 @@ public abstract class Utility {
 		Comparator<ZonedDateTime> comparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
 		return comparator.compare(first, second);
 	}
-	public static ZonedDateTime difference(ZonedDateTime first, ZonedDateTime second) {
-		return;
+	public static Duration difference(ZonedDateTime first, ZonedDateTime second) {
+		return Duration.between(first, second);
 	}
 }
