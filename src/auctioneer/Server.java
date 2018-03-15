@@ -38,6 +38,7 @@ public class Server extends Application {
 			while (true) {
 				// accept a connection
 				// create a thread to deal with the client
+				// send to client product desc & stuff
 				try {
 					clientsQueue.add(new ClientImage(serverSocket.accept(), ClientImage.totalClients));
 					broadcast(Protocol.serverTags.SERVER_STATUS, new Object[]{ serverStatus });
@@ -102,8 +103,10 @@ public class Server extends Application {
 	}
 
 	private static void broadcast(Protocol.serverTags tag, Object data[]) {
-		for(ClientImage client : clientsQueue)
-			client.send(tag, data);
+		if(tag != Protocol.serverTags.NOT_HIGHER && tag != Protocol.serverTags.SEND_ID) {
+			for(ClientImage client : clientsQueue)
+				client.send(tag, data);
+		}
 	}
 
 	public static void removeClient(ClientImage client) { clientsQueue.remove(client); }
@@ -115,11 +118,11 @@ public class Server extends Application {
 			auctionHistory.add(currentAuction);
 
 		currentAuction = new Auction(
-				ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
-				ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
-				"Memories of Green",
-				"A beautiful music from Blade Runner",
-				1982
+			ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
+			ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
+			"Memories of Green",
+			"A beautiful music from Blade Runner",
+			1982
 		);
 
 		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, new Object[]{

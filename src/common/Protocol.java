@@ -1,11 +1,12 @@
 package common;
 
 public class Protocol {
-	// ajouter attribution id
 	public static enum serverTags {
 		// server status
 		SERVER_STATUS,
-		// description of a production (name, description, price)
+		// send id to client
+		SEND_ID,
+		// product (name, description, price)
 		PRODUCT_DESCRIPTION,
 		// time remaining
 		TIME_REMAINING,
@@ -22,11 +23,16 @@ public class Protocol {
 		// generic error
 		ERROR
 	}
-	
-	// ajouter ask_id, ask_desc, ask_highest, ask_remaining
+
 	public static enum clientTags {
 		// submitting a new bid
 		BID_SUBMIT,
+		// ask remaining time
+		ASK_REMAINING,
+		// ask product information
+		ASK_PRODUCT,
+		// ask current highest bid
+		ASK_HIGHEST,
 		// closing connection with the server
 		CLOSE_CONNECTION,
 		// generic error
