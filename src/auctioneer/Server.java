@@ -20,13 +20,17 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server extends Application {
-	private static String serverStartDate;
-	private static ServerStatus serverStatus = ServerStatus.STOPPED;
-	private static ServerSocket serverSocket;
-	private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
-	private static Auction currentAuction;
-	private static ArrayList<Auction> auctionHistory = new ArrayList<Auction>();
-	private int statusBroadcastInterval = 1;
+	// server
+		private static String serverStartDate;
+		private static ServerStatus serverStatus = ServerStatus.STOPPED;
+		private static ServerSocket serverSocket;
+	// clients
+		private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
+	// auction
+		private static Auction currentAuction;
+		private static ArrayList<Auction> auctionHistory = new ArrayList<Auction>();
+	// other
+		private int statusBroadcastInterval = 1;
 
 	public static void main(String[] args) {
 		//launch(args);
@@ -46,7 +50,7 @@ public class Server extends Application {
 			//stop();
 		}
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		/*
@@ -59,14 +63,14 @@ public class Server extends Application {
 				println("Server started on " + serverStartDate);
 			}
 		});
-		
+
 		StackPane root = new StackPane();
 		root.getChildren().add(btn);
 		primaryStage.setScene(new Scene(root, 300, 250));
 		primaryStage.show();
 		 */
 	}
-	
+
 	protected static boolean start() {
 		serverStartDate = Utility.getStringDate();
 		try {
@@ -96,45 +100,43 @@ public class Server extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void broadcast(Protocol.serverTags tag, Object data[]) {
 		for(ClientImage client : clientsQueue)
 			client.send(tag, data);
 	}
-	
-	public static void removeClient(ClientImage client) {
-		clientsQueue.remove(client);
-	}
 
-	public static void println(String data) {
-		Utility.println("[SERVER]> " + data);
-	}
-	
+	public static void removeClient(ClientImage client) { clientsQueue.remove(client); }
+
+	public static void println(String data) { Utility.println("[SERVER]> " + data); }
+
 	public static void beginAuction() {
 		if (currentAuction != null)
 			auctionHistory.add(currentAuction);
 
-		ZonedDateTime start = ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss"));
-		ZonedDateTime deadline = ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss"));		
-		currentAuction = new Auction(start, deadline,"Memories of Green", "A beautiful music from Blade Runner", 1982);
-		
+		currentAuction = new Auction(
+				ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
+				ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
+				"Memories of Green",
+				"A beautiful music from Blade Runner",
+				1982
+		);
+
 		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, new Object[]{
-				currentAuction.getProductName(),
-				currentAuction.getProductDescription(), currentAuction.getInitialPrice()
+			currentAuction.getProductName(),
+			currentAuction.getProductDescription(), currentAuction.getInitialPrice()
 		});
-		
+
 		broadcast(Protocol.serverTags.TIME_REMAINING, new Object[] {
-				Utility.difference(Utility.getDate(), currentAuction.getDeadline())
+			Utility.difference(Utility.getDate(), currentAuction.getDeadline())
 		});
 	}
-	
+
 	public static void addBid(ClientImage client, int amount) {
 		if (amount < currentAuction.getHighestBid().getKey())
 			clientsQueue.get(clientsQueue.indexOf(client)).send(Protocol.serverTags.ERROR, new Object[] {
 					"The bid must be higher than the actual highest bid."
 			});
-			// send ERROR
 		currentAuction.addBid(client.getId(), amount);
 	}
-	
 }
