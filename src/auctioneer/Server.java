@@ -156,8 +156,6 @@ public class Server extends Application {
 	}
 
 	public static boolean isInProgress() {
-		if (currentAuctionIndex == 0)
-			return false;
-		return !auctions.get(currentAuctionIndex).isDealineOver();
+		return !auctions.get(currentAuctionIndex).isDealineOver() && currentAuctionIndex != 0;
 	}
 }

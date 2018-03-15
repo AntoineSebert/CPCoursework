@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
+import java.util.Map;
 
 import common.Protocol;
 import common.ServerProperties;
@@ -14,10 +15,11 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Client extends Application {
-	private static Date connectionDate;
-	private static PrintWriter out;
-	private static BufferedReader in;
-	// static private current highest bid + client id
+	static private Date connectionDate;
+	static private PrintWriter out;
+	static private BufferedReader in;
+	static private int currentHighestBidAmount;
+	static private int currentHighestBidId;
 	static private int id = -1;
 	static Socket mySocket;
 
@@ -49,7 +51,7 @@ public class Client extends Application {
 		}
 		return false;
 	}
-	
+
 	private static void stopClient() {
 		try {
 			out.println(Protocol.clientTags.CLOSE_CONNECTION);
@@ -59,13 +61,13 @@ public class Client extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void send(Protocol.clientTags tag, Object data[]) {
-		System.out.println("Sending " + tag + ' ' + data.toString() + " to server");
+		println("Sending " + tag + ' ' + data.toString() + " to server");
 		out.println(tag);
 		out.println(data);
 	}
-	
+
 	public static void receive() {
 		try {
 			Protocol.serverTags tag = Protocol.serverTags.valueOf(in.readLine());
@@ -90,10 +92,14 @@ public class Client extends Application {
 					println("Time remaining : " + in.readLine());
 					break;
 				case HIGHEST_UPDATE:
-					println("Highest bid is " + in.readLine());
+					currentHighestBidAmount = Integer.parseInt(in.readLine());
+					currentHighestBidId = Integer.parseInt(in.readLine());
+					println("Highest bid is " + currentHighestBidAmount + " from client " + currentHighestBidId );
 					break;
 				case CLOSE_BIDDING:
 					println("The auction has been closed");
+					currentHighestBidAmount = 0;
+					currentHighestBidId = 0;
 					break;
 				case NOT_HIGHER:
 					println("The bid must be higher than the current highest bid");
@@ -102,7 +108,7 @@ public class Client extends Application {
 					println("The winning bid is" + in.readLine());
 					break;
 				case CLOSE_CONNECTION:
-					println("Closing connection with the server...");
+					println("Closing connection with the server");
 					mySocket.close();
 					break;
 				case ERROR:
@@ -118,7 +124,5 @@ public class Client extends Application {
 		}
 	}
 
-	public static void println(String data) {
-		Utility.println("[CLIENT]> " + data);
-	}
+	public static void println(String data) { Utility.println("[CLIENT]> " + data); }
 }
