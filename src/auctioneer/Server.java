@@ -28,10 +28,10 @@ public class Server extends Application {
 	// clients
 		private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
 	// auction
-		private static Auction currentAuction;
-		private static ArrayList<Auction> auctionHistory = new ArrayList<Auction>();
+		private static int currentAuctionIndex = 0;
+		private static ArrayList<Auction> auctions = new ArrayList<Auction>();
 	// other
-		private int statusBroadcastInterval = 1;
+		private static int statusBroadcastInterval = 1;
 
 	public static void main(String[] args) {
 		//launch(args);
@@ -39,10 +39,10 @@ public class Server extends Application {
 			while (true) {
 				// accept a connection
 				// create a thread to deal with the client
-				// send to client product desc & stuff
+				// send to client product info
 				try {
 					clientsQueue.add(new ClientImage(serverSocket.accept(), ClientImage.totalClients));
-					broadcast(Protocol.serverTags.SERVER_STATUS, new Object[]{ serverStatus });
+					broadcast(Protocol.serverTags.SERVER_STATUS, new Object[] { serverStatus });
 				}
 				catch(IOException e) {
 					e.printStackTrace();
@@ -114,46 +114,47 @@ public class Server extends Application {
 
 	public static void println(String data) { Utility.println("[SERVER]> " + data); }
 
-	public static void beginAuction() {
-		if (currentAuction != null)
-			auctionHistory.add(currentAuction);
-
-		currentAuction = new Auction(
+	public static void addAuction() {
+		auctions.add(new Auction(
 			ZonedDateTime.parse("15/03/2018 17:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
 			ZonedDateTime.parse("15/03/2018 18:00:00", DateTimeFormatter.ofPattern("dd MM yyyy HH:mm:ss")),
 			"Memories of Green",
 			"A beautiful music from Blade Runner",
 			1982
-		);
+		));
+	}
+
+	public static void nextAuction() {
+		if (currentAuctionIndex < auctions.size())
+			currentAuctionIndex++;
 
 		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, getProductInfo());
-
 		broadcast(Protocol.serverTags.TIME_REMAINING, new Object[] {
-			Utility.difference(Utility.getDate(), currentAuction.getDeadline())
+			Utility.difference(Utility.getDate(), auctions.get(currentAuctionIndex).getDeadline())
 		});
 	}
 
 	public static void addBid(ClientImage client, int amount) {
-		if (amount < currentAuction.getHighestBid().getKey())
+		if (amount < auctions.get(currentAuctionIndex).getHighestBid().getKey())
 			clientsQueue.get(clientsQueue.indexOf(client)).send(Protocol.serverTags.ERROR, new Object[] {
 					"The bid must be higher than the actual highest bid."
 			});
-		currentAuction.addBid(client.getId(), amount);
+		auctions.get(currentAuctionIndex).addBid(client.getId(), amount);
 	}
 
-	public static Duration getTimeRemaining() { return Utility.difference(currentAuction.getDeadline(), Utility.getDate()); }
+	public static Duration getTimeRemaining() { return Utility.difference(auctions.get(currentAuctionIndex).getDeadline(), Utility.getDate()); }
 
 	public static String[] getProductInfo() {
 		return new String[] {
-				currentAuction.getProductName(),
-				currentAuction.getProductDescription(),
-				currentAuction.getHighestBid().toString()
+				auctions.get(currentAuctionIndex).getProductName(),
+				auctions.get(currentAuctionIndex).getProductDescription(),
+				auctions.get(currentAuctionIndex).getHighestBid().toString()
 		};
 	}
 
 	public static boolean isInProgress() {
-		if (currentAuction == null)
+		if (auctions.get(currentAuctionIndex) == null)
 			return false;
-		return !currentAuction.isDealineOver();
+		return !auctions.get(currentAuctionIndex).isDealineOver();
 	}
 }
