@@ -48,10 +48,11 @@ public class ClientImage {
 					break;
 				case ASK_REMAINING:
 					println(tag.toString() + " received");
-					send(Protocol.serverTags.TIME_REMAINING, new Object[] { getTimeRemaining() });
+					send(Protocol.serverTags.TIME_REMAINING, new Object[] { Server.getTimeRemaining() });
 					break;
 				case ASK_PRODUCT:
 					println(tag.toString() + " received");
+					send(Protocol.serverTags.TIME_REMAINING, Server.getProductInfo());
 					break;
 				case ASK_HIGHEST:
 					println(tag.toString() + " received");

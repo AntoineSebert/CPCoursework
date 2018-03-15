@@ -126,10 +126,7 @@ public class Server extends Application {
 			1982
 		);
 
-		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, new Object[]{
-			currentAuction.getProductName(),
-			currentAuction.getProductDescription(), currentAuction.getInitialPrice()
-		});
+		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, getProductInfo());
 
 		broadcast(Protocol.serverTags.TIME_REMAINING, new Object[] {
 			Utility.difference(Utility.getDate(), currentAuction.getDeadline())
@@ -143,8 +140,14 @@ public class Server extends Application {
 			});
 		currentAuction.addBid(client.getId(), amount);
 	}
+
+	public static Duration getTimeRemaining() { return Utility.difference(currentAuction.getDeadline(), Utility.getDate()); }
 	
-	public static Duration getTimeRemaining() {
-		return Utility.difference(currentAuction.getDeadline(), Utility.getDate());
+	public static String[] getProductInfo() {
+		return new String[] {
+				currentAuction.getProductName(),
+				currentAuction.getProductDescription(),
+				currentAuction.getHighestBid().toString()
+		};
 	}
 }

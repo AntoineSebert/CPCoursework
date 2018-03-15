@@ -26,6 +26,7 @@ public class Auction {
 		this.productName = productName;
 		this.productDescription = productDescription;
 		this.initialPrice = initialPrice;
+		bids.put(0, initialPrice);
 	}
 	
 	public ZonedDateTime getStart() { return start; }
