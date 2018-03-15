@@ -142,12 +142,18 @@ public class Server extends Application {
 	}
 
 	public static Duration getTimeRemaining() { return Utility.difference(currentAuction.getDeadline(), Utility.getDate()); }
-	
+
 	public static String[] getProductInfo() {
 		return new String[] {
 				currentAuction.getProductName(),
 				currentAuction.getProductDescription(),
 				currentAuction.getHighestBid().toString()
 		};
+	}
+
+	public static boolean isInProgress() {
+		if (currentAuction == null)
+			return false;
+		return !currentAuction.isDealineOver();
 	}
 }

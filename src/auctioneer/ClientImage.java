@@ -42,9 +42,13 @@ public class ClientImage {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
 			switch(tag) {
 				case BID_SUBMIT:
-					String amountString = in.readLine();
-					println(tag.toString() + " received :" + amountString);
-					Server.addBid(this, Integer.parseInt(amountString));
+					if(Server.isInProgress()) {
+						String amountString = in.readLine();
+						println(tag.toString() + " received :" + amountString);
+						Server.addBid(this, Integer.parseInt(amountString));
+					}
+					else
+						send(Protocol.serverTags.CLOSE_BIDDING, new Object[] {});
 					break;
 				case ASK_REMAINING:
 					println(tag.toString() + " received");
@@ -56,6 +60,7 @@ public class ClientImage {
 					break;
 				case ASK_HIGHEST:
 					println(tag.toString() + " received");
+					send(Protocol.serverTags.HIGHEST_UPDATE, new Object[] {});
 					break;
 				case CLOSE_CONNECTION:
 					Server.removeClient(this);

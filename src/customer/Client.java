@@ -18,7 +18,7 @@ public class Client extends Application {
 	private static PrintWriter out;
 	private static BufferedReader in;
 	// static private current highest bid + client id
-	static private int id;
+	static private int id = -1;
 	static Socket mySocket;
 
 	public static void main(String[] args) {
@@ -73,14 +73,24 @@ public class Client extends Application {
 				case SERVER_STATUS:
 					println("Server status is " + in.readLine());
 					break;
+				case SEND_ID:
+					if(id == -1) {
+						id = Integer.parseInt(in.readLine());
+						println("New id is " + id);
+					}
+					else
+						send(Protocol.clientTags.ERROR, new Object[] { "Id already assigned" });
+					break;
 				case PRODUCT_DESCRIPTION:
 					println("The product is " + in.readLine());
+					println('\t' + in.readLine());
+					println('\t' + in.readLine());
 					break;
 				case TIME_REMAINING:
 					println("Time remaining : " + in.readLine());
 					break;
 				case HIGHEST_UPDATE:
-					println("Highest bid is now " + in.readLine());
+					println("Highest bid is " + in.readLine());
 					break;
 				case CLOSE_BIDDING:
 					println("The auction has been closed");
