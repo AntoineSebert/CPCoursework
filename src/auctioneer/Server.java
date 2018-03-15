@@ -32,17 +32,19 @@ public class Server extends Application {
 		private static ArrayList<Auction> auctions = new ArrayList<Auction>();
 	// other
 		private static int statusBroadcastInterval = 1;
+		private static boolean automaticProcess = true;
 
 	public static void main(String[] args) {
 		//launch(args);
 		if (start()) {
 			while (true) {
-				// accept a connection
-				// create a thread to deal with the client
-				// send to client product info
+				// accept a connection, create a thread to deal with the client, send to client product info
 				try {
 					clientsQueue.add(new ClientImage(serverSocket.accept(), ClientImage.totalClients));
 					broadcast(Protocol.serverTags.SERVER_STATUS, new Object[] { serverStatus });
+					addAuction();
+					if(automaticProcess && auctions.get(currentAuctionIndex).isDealineOver())
+						nextAuction();
 				}
 				catch(IOException e) {
 					e.printStackTrace();
@@ -65,7 +67,6 @@ public class Server extends Application {
 				println("Server started on " + serverStartDate);
 			}
 		});
-
 		StackPane root = new StackPane();
 		root.getChildren().add(btn);
 		primaryStage.setScene(new Scene(root, 300, 250));
@@ -125,19 +126,21 @@ public class Server extends Application {
 	}
 
 	public static void nextAuction() {
-		if (currentAuctionIndex < auctions.size())
+		if (currentAuctionIndex < auctions.size()) {
 			currentAuctionIndex++;
-
-		broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, getProductInfo());
-		broadcast(Protocol.serverTags.TIME_REMAINING, new Object[] {
-			Utility.difference(Utility.getDate(), auctions.get(currentAuctionIndex).getDeadline())
-		});
+			broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, getProductInfo());
+			broadcast(Protocol.serverTags.TIME_REMAINING, new Object[] {
+				Utility.difference(Utility.getDate(), auctions.get(currentAuctionIndex).getDeadline())
+			});
+		}
+		else
+			println("There is no next auction");
 	}
 
 	public static void addBid(ClientImage client, int amount) {
 		if (amount < auctions.get(currentAuctionIndex).getHighestBid().getKey())
 			clientsQueue.get(clientsQueue.indexOf(client)).send(Protocol.serverTags.ERROR, new Object[] {
-					"The bid must be higher than the actual highest bid."
+				"The bid must be higher than the actual highest bid."
 			});
 		auctions.get(currentAuctionIndex).addBid(client.getId(), amount);
 	}
@@ -146,14 +149,14 @@ public class Server extends Application {
 
 	public static String[] getProductInfo() {
 		return new String[] {
-				auctions.get(currentAuctionIndex).getProductName(),
-				auctions.get(currentAuctionIndex).getProductDescription(),
-				auctions.get(currentAuctionIndex).getHighestBid().toString()
+			auctions.get(currentAuctionIndex).getProductName(),
+			auctions.get(currentAuctionIndex).getProductDescription(),
+			auctions.get(currentAuctionIndex).getHighestBid().toString()
 		};
 	}
 
 	public static boolean isInProgress() {
-		if (auctions.get(currentAuctionIndex) == null)
+		if (currentAuctionIndex == 0)
 			return false;
 		return !auctions.get(currentAuctionIndex).isDealineOver();
 	}
