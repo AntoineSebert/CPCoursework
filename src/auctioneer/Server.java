@@ -2,6 +2,7 @@ package auctioneer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -141,5 +142,9 @@ public class Server extends Application {
 					"The bid must be higher than the actual highest bid."
 			});
 		currentAuction.addBid(client.getId(), amount);
+	}
+	
+	public static Duration getTimeRemaining() {
+		return Utility.difference(currentAuction.getDeadline(), Utility.getDate());
 	}
 }

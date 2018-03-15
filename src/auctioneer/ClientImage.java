@@ -43,15 +43,25 @@ public class ClientImage {
 			switch(tag) {
 				case BID_SUBMIT:
 					String amountString = in.readLine();
-					println("BID_SUBMIT received :" + amountString);
+					println(tag.toString() + " received :" + amountString);
 					Server.addBid(this, Integer.parseInt(amountString));
+					break;
+				case ASK_REMAINING:
+					println(tag.toString() + " received");
+					send(Protocol.serverTags.TIME_REMAINING, new Object[] { getTimeRemaining() });
+					break;
+				case ASK_PRODUCT:
+					println(tag.toString() + " received");
+					break;
+				case ASK_HIGHEST:
+					println(tag.toString() + " received");
 					break;
 				case CLOSE_CONNECTION:
 					Server.removeClient(this);
-					println("Connection with client " + id + " closed");
+					println(tag.toString() + " : closing client_" + id + " connection");
 					break;
 				case ERROR:
-					println("Error : " + in.readLine());
+					println(tag.toString() + " : " + in.readLine());
 					break;
 				default:
 					println("Unknown instruction :" + tag + ", value :" + in.readLine());
