@@ -27,6 +27,7 @@ public class Server extends Application {
 		private static ServerSocket serverSocket;
 	// clients
 		private static ArrayList<ClientImage> clientsQueue = new ArrayList<ClientImage>();
+		private static ArrayList<ClientImage> disconnectedClients = new ArrayList<ClientImage>();
 	// auction
 		private static int currentAuctionIndex = 0;
 		private static ArrayList<Auction> auctions = new ArrayList<Auction>();
@@ -114,6 +115,8 @@ public class Server extends Application {
 	}
 
 	public static void removeClient(ClientImage client) { clientsQueue.remove(client); }
+	
+	public static void addDisconnected(ClientImage client) { disconnectedClients.add(client); }
 
 	public static void println(String data) { Utility.println("[SERVER]> " + data); }
 

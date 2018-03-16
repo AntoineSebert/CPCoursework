@@ -73,6 +73,7 @@ public class ClientImage {
 					send(Protocol.serverTags.HIGHEST_UPDATE, new Object[] {});
 					break;
 				case CLOSE_CONNECTION:
+					Server.addDisconnected(this);
 					Server.removeClient(this);
 					disconnectionDate = Utility.getDate();
 					println(tag.toString() + " : closing client_" + id + " connection");
