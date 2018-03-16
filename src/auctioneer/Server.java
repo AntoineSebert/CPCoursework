@@ -32,7 +32,7 @@ public class Server extends Application {
 		private static int currentAuctionIndex = 0;
 		private static ArrayList<Auction> auctions = new ArrayList<Auction>();
 	// other
-		private static int statusBroadcastInterval = 1;
+		private static double broadcastUpdateInterval = 1.0;
 		private static boolean automaticProcess = true;
 
 	public static void main(String[] args) {
@@ -80,6 +80,7 @@ public class Server extends Application {
 		try {
 			serverSocket = new ServerSocket(ServerProperties.portNumber);
 			println("Server started on " + serverStartDate);
+			println("Broadcasting update every " + broadcastUpdateInterval + " seconds");
 			serverStatus = ServerStatus.RUNNING;
 			return true;
 		}

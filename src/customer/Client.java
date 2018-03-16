@@ -14,13 +14,16 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Client extends Application {
-	static private Date connectionDate;
-	static private PrintWriter out;
-	static private BufferedReader in;
-	static private int currentHighestBidAmount;
-	static private int currentHighestBidId;
-	static private int id = -1;
-	static Socket mySocket;
+	// server communication
+		static private Date connectionDate;
+		static Socket mySocket;
+		static private int id = -1;
+		static private PrintWriter out;
+		static private BufferedReader in;
+		static private double updateInterval = 0.1;
+	// current auction
+		static private int currentHighestBidAmount;
+		static private int currentHighestBidId;
 
 	public static void main(String[] args) {
 		//launch(args);
@@ -40,7 +43,8 @@ public class Client extends Application {
 		connectionDate = new Date();
 		try {
 			mySocket = new Socket("localhost", ServerProperties.portNumber);
-			println("Connection established on" + connectionDate);
+			println("Connection established on " + connectionDate);
+			println("Refreshing fields every " + updateInterval + " seconds");
 			out = new PrintWriter(mySocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 			return true;
@@ -97,8 +101,7 @@ public class Client extends Application {
 					break;
 				case CLOSE_BIDDING:
 					println("The auction has been closed");
-					currentHighestBidAmount = 0;
-					currentHighestBidId = 0;
+					cleanAuctionAttributes();
 					break;
 				case NOT_HIGHER:
 					println("The bid must be higher than the current highest bid");
@@ -108,6 +111,7 @@ public class Client extends Application {
 					break;
 				case CLOSE_CONNECTION:
 					println("Closing connection with the server");
+					cleanAuctionAttributes();
 					mySocket.close();
 					break;
 				case ERROR:
@@ -124,4 +128,9 @@ public class Client extends Application {
 	}
 
 	public static void println(String data) { Utility.println("[CLIENT]> " + data); }
+	
+	public static void cleanAuctionAttributes() {
+		currentHighestBidAmount = 0;
+		currentHighestBidId = -1;
+	}
 }

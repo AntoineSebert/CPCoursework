@@ -76,7 +76,7 @@ public class ClientImage {
 					Server.addDisconnected(this);
 					Server.removeClient(this);
 					disconnectionDate = Utility.getDate();
-					println(tag.toString() + " : closing client_" + id + " connection");
+					println(tag.toString() + " : closing client_" + id + " connection on " + disconnectionDate);
 					break;
 				case ERROR:
 					println(tag.toString() + " : " + in.readLine());
