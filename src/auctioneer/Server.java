@@ -30,7 +30,7 @@ public class Server extends Application {
 		private static ArrayList<ClientHandler> clientsQueue = new ArrayList<ClientHandler>();
 		private static ArrayList<ClientHandler> disconnectedClients = new ArrayList<ClientHandler>();
 	// auction
-		private static int currentAuctionIndex = 0;
+		private static int currentAuctionIndex = -1;
 		private static ArrayList<Auction> auctions = new ArrayList<Auction>();
 	// other
 		private static double broadcastUpdateInterval = 1.0;
@@ -58,8 +58,10 @@ public class Server extends Application {
 				catch(InterruptedException e) {
 					e.printStackTrace();
 				}
-				if(automaticProcess && auctions.get(currentAuctionIndex).isDealineOver())
-					nextAuction();
+				if(automaticProcess && currentAuctionIndex != -1) {
+					if(auctions.get(currentAuctionIndex).isDealineOver())
+						nextAuction();
+				}
 			}
 			//stop();
 		}
@@ -125,7 +127,7 @@ public class Server extends Application {
 	}
 
 	public static void removeClient(ClientHandler client) { clientsQueue.remove(client); }
-	
+
 	public static void addDisconnected(ClientHandler client) { disconnectedClients.add(client); }
 
 	public static void println(String data) { Utility.println("[SERVER]> " + data); }
@@ -138,6 +140,7 @@ public class Server extends Application {
 			"A beautiful music from Blade Runner",
 			1982
 		));
+		println("New auction added to queue");
 	}
 
 	public static void nextAuction() {
@@ -187,8 +190,10 @@ public class Server extends Application {
 	}
 
 	public static boolean isInProgress() {
-		return !auctions.get(currentAuctionIndex).isDealineOver() && currentAuctionIndex != 0;
+		if(currentAuctionIndex == -1)
+			return false;
+		return !auctions.get(currentAuctionIndex).isDealineOver();
 	}
-	
+
 	public static Map.Entry<Integer, Integer> getHighestBid() { return auctions.get(currentAuctionIndex).getHighestBid(); }
 }
