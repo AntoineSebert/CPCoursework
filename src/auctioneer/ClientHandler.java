@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import common.Protocol;
 import common.Utility;
 
-public class ClientImage {
+public class ClientHandler extends Thread {
 	static public int totalClients = 0;
 	private PrintWriter out;
 	private BufferedReader in;
@@ -19,13 +19,12 @@ public class ClientImage {
 	private ZonedDateTime connectionDate;
 	private ZonedDateTime disconnectionDate = null;
 
-	public ClientImage(Socket newSocket, int id) {
+	public ClientHandler(Socket newSocket, int id) {
 		connectionDate = Utility.getDate();
 		totalClients++;
 		this.id = id;
 		socket = newSocket;
 		println("Connexion established with client " + id + " on " + connectionDate);
-		
 		try {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -36,7 +35,11 @@ public class ClientImage {
 		receive();
 	}
 
-	public void send(Protocol.serverTags tag, Object data[]) {
+	public void run() {
+		
+	}
+
+	public void send(Protocol.serverTags tag, Object... data) {
 		if(!Server.isInProgress() && (
 				tag == Protocol.serverTags.PRODUCT_DESCRIPTION
 				|| tag == Protocol.serverTags.TIME_REMAINING
@@ -46,7 +49,7 @@ public class ClientImage {
 			println("No auction in progress, cannot send " + tag);
 			return;
 		}
-		println("Sending " + tag + ':' + data.toString() + " to client " + id);
+		println("Sending " + tag + ':' + data + " to client " + id);
 		out.println(tag);
 		out.println(data);
 	}
@@ -62,15 +65,15 @@ public class ClientImage {
 					break;
 				case ASK_REMAINING:
 					println(tag.toString() + " received");
-					send(Protocol.serverTags.TIME_REMAINING, new Object[] { Server.getTimeRemaining() });
+					send(Protocol.serverTags.TIME_REMAINING, Server.getTimeRemaining());
 					break;
 				case ASK_PRODUCT:
 					println(tag.toString() + " received");
-					send(Protocol.serverTags.TIME_REMAINING, Server.getProductInfo());
+					send(Protocol.serverTags.TIME_REMAINING, (Object[])Server.getProductInfo());
 					break;
 				case ASK_HIGHEST:
 					println(tag.toString() + " received");
-					send(Protocol.serverTags.HIGHEST_UPDATE, new Object[] {});
+					send(Protocol.serverTags.HIGHEST_UPDATE, Server.getHighestBid().getKey(), Server.getHighestBid().getValue());
 					break;
 				case CLOSE_CONNECTION:
 					Server.addDisconnected(this);
@@ -91,7 +94,7 @@ public class ClientImage {
 		}
 	}
 
-	public int getId() { return id; }
+	public int getClientId() { return id; }
 
 	public void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
 }

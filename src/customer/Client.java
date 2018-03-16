@@ -28,7 +28,7 @@ public class Client extends Application {
 	public static void main(String[] args) {
 		//launch(args);
 		if(start()) {
-			send(Protocol.clientTags.BID_SUBMIT, new Object[] { 100 });
+			send(Protocol.clientTags.BID_SUBMIT, 100);
 			receive();
 			stopClient();
 		}
@@ -65,10 +65,11 @@ public class Client extends Application {
 		}
 	}
 
-	public static void send(Protocol.clientTags tag, Object data[]) {
-		println("Sending " + tag + ' ' + data.toString() + " to server");
+	public static void send(Protocol.clientTags tag, Object... data) {
+		println("Sending " + tag + ' ' + data + " to server");
 		out.println(tag);
-		out.println(data);
+		for(Object element : data)
+			out.println(element);
 	}
 
 	public static void receive() {
@@ -84,7 +85,7 @@ public class Client extends Application {
 						println("New id is " + id);
 					}
 					else
-						send(Protocol.clientTags.ERROR, new Object[] { "Id already assigned" });
+						send(Protocol.clientTags.ERROR, "Id already assigned");
 					break;
 				case PRODUCT_DESCRIPTION:
 					println("The product is " + in.readLine());
