@@ -140,6 +140,10 @@ public class Server extends Application {
 	}
 
 	public static void addBid(ClientImage client, int amount) {
+		if(!isInProgress()) {
+			println("No auction is in progress, cannot add bid from client " + client.getId());
+			return;
+		}
 		if (amount < auctions.get(currentAuctionIndex).getHighestBid().getKey())
 			clientsQueue.get(clientsQueue.indexOf(client)).send(Protocol.serverTags.ERROR, new Object[] {
 				"The bid must be higher than the actual highest bid."
@@ -147,9 +151,19 @@ public class Server extends Application {
 		auctions.get(currentAuctionIndex).addBid(client.getId(), amount);
 	}
 
-	public static Duration getTimeRemaining() { return Utility.difference(auctions.get(currentAuctionIndex).getDeadline(), Utility.getDate()); }
+	public static Duration getTimeRemaining() {
+		if(!isInProgress()) {
+			println("No auction is progress, cannot get time remaining");
+			return null;
+		}
+		return Utility.difference(auctions.get(currentAuctionIndex).getDeadline(), Utility.getDate());
+	}
 
 	public static String[] getProductInfo() {
+		if(!isInProgress()) {
+			println("No auction is progress, cannot get product information");
+			return null;
+		}
 		return new String[] {
 			auctions.get(currentAuctionIndex).getProductName(),
 			auctions.get(currentAuctionIndex).getProductDescription(),
