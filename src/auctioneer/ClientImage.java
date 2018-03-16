@@ -15,7 +15,7 @@ public class ClientImage {
 	private BufferedReader in;
 	private Socket socket;
 	private int id;
-	
+
 	public ClientImage(Socket newSocket, int id) {
 		totalClients++;
 		this.id = id;
@@ -30,13 +30,22 @@ public class ClientImage {
 		}
 		receive();
 	}
-	
+
 	public void send(Protocol.serverTags tag, Object data[]) {
+		if(!Server.isInProgress() && (
+				tag == Protocol.serverTags.PRODUCT_DESCRIPTION
+				|| tag == Protocol.serverTags.TIME_REMAINING
+				|| tag == Protocol.serverTags.HIGHEST_UPDATE
+				|| tag == Protocol.serverTags.CLOSE_BIDDING)
+		) {
+			println("No auction in progress, cannot send " + tag);
+			return;
+		}
 		System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
 		out.println(tag);
 		out.println(data);
 	}
-	
+
 	public void receive() {
 		try {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());

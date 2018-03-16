@@ -5,17 +5,17 @@ public class Protocol {
 		// server status
 		SERVER_STATUS,
 		// send id to client
-		SEND_ID,
+		SEND_ID, /* NO BROADCAST */
 		// product (name, description, price)
-		PRODUCT_DESCRIPTION,
+		PRODUCT_DESCRIPTION, /* ONLY IN PROGESS */
 		// time remaining
-		TIME_REMAINING,
+		TIME_REMAINING, /* ONLY IN PROGESS */
 		// update of the highest bid
-		HIGHEST_UPDATE,
+		HIGHEST_UPDATE, /* ONLY IN PROGESS */
 		// closing of the current auction
-		CLOSE_BIDDING,
+		CLOSE_BIDDING, /* ONLY IN PROGESS */
 		// bid is not higher than previous bid
-		NOT_HIGHER,
+		NOT_HIGHER, /* NO BROADCAST */
 		// bid that have won the auction
 		WINNING_BID,
 		// closing connection with the client

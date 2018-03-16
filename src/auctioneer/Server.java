@@ -105,10 +105,12 @@ public class Server extends Application {
 	}
 
 	private static void broadcast(Protocol.serverTags tag, Object data[]) {
-		if(tag != Protocol.serverTags.NOT_HIGHER && tag != Protocol.serverTags.SEND_ID) {
-			for(ClientImage client : clientsQueue)
-				client.send(tag, data);
+		if(tag == Protocol.serverTags.NOT_HIGHER || tag == Protocol.serverTags.SEND_ID) {
+			println(tag + " cannot be broadcasted");
+			return;
 		}
+		for(ClientImage client : clientsQueue)
+			client.send(tag, data);
 	}
 
 	public static void removeClient(ClientImage client) { clientsQueue.remove(client); }
