@@ -38,7 +38,7 @@ public class Auction {
 			public int getInitialPrice() { return initialPrice; }
 		// other accessors
 			public Map.Entry<Integer, Integer> getHighestBid() { return bids.lastEntry(); }
-			public boolean isDealineOver() { return Utility.compareDates(start, deadline) < 0; }
+			public boolean isDealineOver() { return Utility.compareDates(start, deadline) > 0; }
 		// mutators
 			public void addBid(int clientId, int amount) { bids.put(amount, clientId); }
 }

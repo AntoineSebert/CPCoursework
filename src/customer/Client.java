@@ -28,9 +28,11 @@ public class Client extends Application {
 	public static void main(String[] args) {
 		//launch(args);
 		if(start()) {
-			send(Protocol.clientTags.BID_SUBMIT, 100);
-			receive();
-			stopClient();
+			while(true) {
+				send(Protocol.clientTags.BID_SUBMIT, 100);
+				receive();
+			}
+			//stopClient();
 		}
 	}
 	

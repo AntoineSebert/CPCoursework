@@ -60,7 +60,7 @@ public class ClientHandler extends Thread {
 			switch(tag) {
 				case BID_SUBMIT:
 					String amountString = in.readLine();
-					println(tag.toString() + " received :" + amountString);
+					println(tag.toString() + " received : " + amountString);
 					Server.addBid(this, Integer.parseInt(amountString));
 					break;
 				case ASK_REMAINING:

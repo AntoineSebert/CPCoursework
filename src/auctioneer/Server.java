@@ -41,6 +41,7 @@ public class Server extends Application {
 		if (start()) {
 			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 			addAuction();
+			nextAuction();
 			while (true) {
 				ClientHandler worker = null;
 				try {
@@ -58,10 +59,12 @@ public class Server extends Application {
 				catch(InterruptedException e) {
 					e.printStackTrace();
 				}
+				/*
 				if(automaticProcess && currentAuctionIndex != -1) {
 					if(auctions.get(currentAuctionIndex).isDealineOver())
 						nextAuction();
 				}
+				*/
 			}
 			//stop();
 		}
@@ -135,7 +138,7 @@ public class Server extends Application {
 	public static void addAuction() {
 		auctions.add(new Auction(
 			ZonedDateTime.parse("2007-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
-			ZonedDateTime.parse("2017-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
+			ZonedDateTime.parse("2018-12-12T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
 			"Memories of Green",
 			"A beautiful music from Blade Runner",
 			1982
