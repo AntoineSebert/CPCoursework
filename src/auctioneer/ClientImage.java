@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.ZonedDateTime;
 
 import common.Protocol;
 import common.Utility;
@@ -15,12 +16,16 @@ public class ClientImage {
 	private BufferedReader in;
 	private Socket socket;
 	private int id;
+	private ZonedDateTime connectionDate;
+	private ZonedDateTime disconnectionDate = null;
 
 	public ClientImage(Socket newSocket, int id) {
+		connectionDate = Utility.getDate();
 		totalClients++;
 		this.id = id;
 		socket = newSocket;
-		println("Connexion established with client ");
+		println("Connexion established with client " + id + " on " + connectionDate);
+		
 		try {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -41,7 +46,7 @@ public class ClientImage {
 			println("No auction in progress, cannot send " + tag);
 			return;
 		}
-		System.out.println("Sending " + tag + ':' + data.toString() + " to client " + id);
+		println("Sending " + tag + ':' + data.toString() + " to client " + id);
 		out.println(tag);
 		out.println(data);
 	}
@@ -51,13 +56,9 @@ public class ClientImage {
 			Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
 			switch(tag) {
 				case BID_SUBMIT:
-					if(Server.isInProgress()) {
-						String amountString = in.readLine();
-						println(tag.toString() + " received :" + amountString);
-						Server.addBid(this, Integer.parseInt(amountString));
-					}
-					else
-						send(Protocol.serverTags.CLOSE_BIDDING, new Object[] {});
+					String amountString = in.readLine();
+					println(tag.toString() + " received :" + amountString);
+					Server.addBid(this, Integer.parseInt(amountString));
 					break;
 				case ASK_REMAINING:
 					println(tag.toString() + " received");
@@ -73,6 +74,7 @@ public class ClientImage {
 					break;
 				case CLOSE_CONNECTION:
 					Server.removeClient(this);
+					disconnectionDate = Utility.getDate();
 					println(tag.toString() + " : closing client_" + id + " connection");
 					break;
 				case ERROR:
@@ -88,11 +90,7 @@ public class ClientImage {
 		}
 	}
 
-	public int getId() {
-		return id;
-	}
+	public int getId() { return id; }
 
-	public void println(String data) {
-		Utility.println("[SERVER_" + id + "]> " + data);
-	}
+	public void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
 }

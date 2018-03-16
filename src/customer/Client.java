@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
-import java.util.Map;
 
 import common.Protocol;
 import common.ServerProperties;
