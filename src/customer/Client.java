@@ -72,6 +72,7 @@ public class Client extends Application {
 		out.println(tag);
 		for(Object element : data)
 			out.println(element);
+		out.flush();
 	}
 
 	public static void receive() {
@@ -90,9 +91,9 @@ public class Client extends Application {
 						send(Protocol.clientTags.ERROR, "Id already assigned");
 					break;
 				case PRODUCT_DESCRIPTION:
-					println("The product is " + in.readLine());
-					println('\t' + in.readLine());
-					println('\t' + in.readLine());
+					println("The product is " + in.read());
+					println("\t" + in.read());
+					println("\t" + in.read());
 					break;
 				case TIME_REMAINING:
 					println("Time remaining : " + in.readLine());
@@ -131,7 +132,7 @@ public class Client extends Application {
 	}
 
 	public static void println(String data) { Utility.println("[CLIENT]> " + data); }
-	
+
 	public static void cleanAuctionAttributes() {
 		currentHighestBidAmount = 0;
 		currentHighestBidId = -1;

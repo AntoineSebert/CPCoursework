@@ -52,19 +52,16 @@ public class Server extends Application {
 				}
 				clientsQueue.add(worker);
 				worker.start();
-				worker.send(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
 				try {
 					worker.join();
 				}
 				catch(InterruptedException e) {
 					e.printStackTrace();
 				}
-				/*
 				if(automaticProcess && currentAuctionIndex != -1) {
 					if(auctions.get(currentAuctionIndex).isDealineOver())
 						nextAuction();
 				}
-				*/
 			}
 			//stop();
 		}
@@ -188,7 +185,7 @@ public class Server extends Application {
 		return new String[] {
 			auctions.get(currentAuctionIndex).getProductName(),
 			auctions.get(currentAuctionIndex).getProductDescription(),
-			auctions.get(currentAuctionIndex).getHighestBid().toString()
+			auctions.get(currentAuctionIndex).getHighestBid().getKey().toString()
 		};
 	}
 

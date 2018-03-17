@@ -28,6 +28,7 @@ public class ClientHandler extends Thread {
 		try {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			send(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])Server.getProductInfo());
 		}
 		catch(IOException e) {
 			e.printStackTrace();
@@ -49,9 +50,14 @@ public class ClientHandler extends Thread {
 			println("No auction in progress, cannot send " + tag);
 			return;
 		}
-		println("Sending " + tag + ':' + data + " to client " + id);
+		println("Sending " + tag + " to client " + id + ':');
+		for(Object element : data)
+			println("\t" + element);
+
 		out.println(tag);
-		out.println(data);
+		for(Object element : data)
+			out.println(element);
+		out.flush();
 	}
 
 	public void receive() {
