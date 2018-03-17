@@ -185,7 +185,7 @@ public class Server extends Application {
 		return new String[] {
 			auctions.get(currentAuctionIndex).getProductName(),
 			auctions.get(currentAuctionIndex).getProductDescription(),
-			auctions.get(currentAuctionIndex).getHighestBid().getKey().toString()
+			auctions.get(currentAuctionIndex).getHighestBid().getValue().toString()
 		};
 	}
 

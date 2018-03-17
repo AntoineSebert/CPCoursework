@@ -1,9 +1,8 @@
-/**
- * 
- */
 package common;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -38,21 +37,12 @@ public class Auction {
 			public int getInitialPrice() { return initialPrice; }
 		// other accessors
 			public Map.Entry<Integer, Integer> getHighestBid() {
-				//
-				Map.Entry<Integer, Integer> maxEntry = null;
-
-				for(Map.Entry<Integer, Integer> entry : bids.entrySet()) {
-					if(maxEntry == null || 0 < entry.getValue().compareTo(maxEntry.getValue()))
-						maxEntry = entry;
-				}
-				//
-				// refaire !
-				return bids.lastEntry();
+				return Collections.max(bids.entrySet(), Comparator.comparingInt(Map.Entry::getValue));
 			}
 			public boolean isDealineOver() { return Utility.compareDates(start, deadline) > 0; }
 		// mutators
 			public void addBid(int clientId, int amount) {
-				// refaire ! vérifier si amount plus grand que précédents
-				bids.put(amount, clientId);
+				if(0 < getHighestBid().getValue().compareTo(amount))
+					bids.put(clientId, amount);
 			}
 }

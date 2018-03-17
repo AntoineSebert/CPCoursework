@@ -28,8 +28,8 @@ public class Client extends Application {
 	public static void main(String[] args) {
 		//launch(args);
 		if(start()) {
+			send(Protocol.clientTags.BID_SUBMIT, 100);
 			while(true) {
-				send(Protocol.clientTags.BID_SUBMIT, 100);
 				receive();
 			}
 			//stopClient();
@@ -44,7 +44,7 @@ public class Client extends Application {
 	static private boolean start() {
 		connectionDate = new Date();
 		try {
-			mySocket = new Socket("localhost", ServerProperties.portNumber);
+			mySocket = new Socket(ServerProperties.serverAddress, ServerProperties.portNumber);
 			println("Connection established on " + connectionDate);
 			println("Refreshing fields every " + updateInterval + " seconds");
 			out = new PrintWriter(mySocket.getOutputStream(), true);
@@ -68,7 +68,10 @@ public class Client extends Application {
 	}
 
 	public static void send(Protocol.clientTags tag, Object... data) {
-		println("Sending " + tag + ' ' + data + " to server");
+		println("Sending " + tag + " to server :");
+		for(Object element : data)
+			println("\t" + element);
+
 		out.println(tag);
 		for(Object element : data)
 			out.println(element);
@@ -85,15 +88,17 @@ public class Client extends Application {
 				case SEND_ID:
 					if(id == -1) {
 						id = Integer.parseInt(in.readLine());
-						println("New id is " + id);
+						println("New id is :");
+						println(Integer.toString(id));
 					}
 					else
 						send(Protocol.clientTags.ERROR, "Id already assigned");
 					break;
 				case PRODUCT_DESCRIPTION:
-					println("The product is " + in.read());
-					println("\t" + in.read());
-					println("\t" + in.read());
+					println("The product is :");
+					println("\t" + in.readLine());
+					println("\t" + in.readLine());
+					println("\t" + in.readLine());
 					break;
 				case TIME_REMAINING:
 					println("Time remaining : " + in.readLine());
