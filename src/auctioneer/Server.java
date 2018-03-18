@@ -7,6 +7,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import common.Auction;
 import common.Protocol;
@@ -26,6 +30,14 @@ public class Server extends Application {
 		private static String serverStartDate;
 		private static ServerStatus serverStatus = ServerStatus.STOPPED;
 		private static ServerSocket serverSocket;
+		private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		final static Runnable statusNotifier = new Runnable() {
+			public void run() {
+				if(isInProgress())
+					broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex).getHighestBid());
+			}
+		};
+		final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(statusNotifier, 1, 1, TimeUnit.SECONDS);
 	// clients
 		private static ArrayList<ClientHandler> clientsQueue = new ArrayList<ClientHandler>();
 		private static ArrayList<ClientHandler> disconnectedClients = new ArrayList<ClientHandler>();
@@ -40,7 +52,6 @@ public class Server extends Application {
 		Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 		//launch(args);
 		if (start()) {
-			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 			addAuction();
 			nextAuction();
 			while (true) {
@@ -94,6 +105,9 @@ public class Server extends Application {
 			println("Server started on " + serverStartDate);
 			println("Broadcasting update every " + broadcastUpdateInterval + " seconds");
 			serverStatus = ServerStatus.RUNNING;
+			scheduler.schedule(new Runnable() {
+				public void run() { statusNotifierHandle.cancel(true); }
+			}, 60 * 60, TimeUnit.SECONDS);
 			return true;
 		}
 		catch(IOException e) {
@@ -104,9 +118,15 @@ public class Server extends Application {
 	}
 
 	public static void stopServer() {
+		serverStatus = ServerStatus.STOPPED;
 		for(ClientHandler client : clientsQueue) {
 			client.send(Protocol.serverTags.CLOSE_CONNECTION);
 			println("Closing connection with client " + client.getId());
+			try {
+				client.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			clientsQueue.remove(client);
 		}
 		try {
@@ -197,8 +217,10 @@ public class Server extends Application {
 	}
 
 	public static Map.Entry<Integer, Integer> getHighestBid() { return auctions.get(currentAuctionIndex).getHighestBid(); }
-	
+
 	public static void connectionsInfo() {
+		// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
+		
 		//parcourir clients queue
 		// écrire date connexion
 		// si client.getsate = thread.state.terminated
