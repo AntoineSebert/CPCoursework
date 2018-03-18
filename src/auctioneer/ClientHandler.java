@@ -38,6 +38,10 @@ public class ClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
+	public void start() {
+		
+	}
 
 	public void run() {
 		while(disconnectionDate == null)

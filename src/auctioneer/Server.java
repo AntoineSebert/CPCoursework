@@ -37,6 +37,7 @@ public class Server extends Application {
 		private static boolean automaticProcess = true;
 
 	public static void main(String[] args) {
+		Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 		//launch(args);
 		if (start()) {
 			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
@@ -196,4 +197,11 @@ public class Server extends Application {
 	}
 
 	public static Map.Entry<Integer, Integer> getHighestBid() { return auctions.get(currentAuctionIndex).getHighestBid(); }
+	
+	public static void connectionsInfo() {
+		//parcourir clients queue
+		// écrire date connexion
+		// si client.getsate = thread.state.terminated
+			// écrire date déconnexion
+	}
 }
