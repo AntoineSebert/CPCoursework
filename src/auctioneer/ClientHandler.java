@@ -11,13 +11,16 @@ import common.Protocol;
 import common.Utility;
 
 public class ClientHandler extends Thread {
-	static public int totalClients = 0;
-	private PrintWriter out;
-	private BufferedReader in;
-	private Socket socket;
-	private int id;
-	private ZonedDateTime connectionDate;
-	private ZonedDateTime disconnectionDate = null;
+	// static
+		static public int totalClients = 0;
+	// connection
+		private PrintWriter out;
+		private BufferedReader in;
+		private Socket socket;
+	// instance data
+		private int id;
+		private ZonedDateTime connectionDate;
+		private ZonedDateTime disconnectionDate = null;
 
 	public ClientHandler(Socket newSocket, int id) {
 		connectionDate = Utility.getDate();
@@ -29,15 +32,16 @@ public class ClientHandler extends Thread {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			send(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])Server.getProductInfo());
+			receive();
 		}
 		catch(IOException e) {
 			e.printStackTrace();
 		}
-		receive();
 	}
 
 	public void run() {
-		
+		while(disconnectionDate == null)
+			receive();
 	}
 
 	public void send(Protocol.serverTags tag, Object... data) {
@@ -58,7 +62,7 @@ public class ClientHandler extends Thread {
 		out.println(tag);
 		for(Object element : data)
 			out.println(element);
-		out.flush();
+		yield();
 	}
 
 	public void receive() {
@@ -99,6 +103,7 @@ public class ClientHandler extends Thread {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+		yield();
 	}
 
 	public int getClientId() { return id; }

@@ -75,7 +75,6 @@ public class Client extends Application {
 		out.println(tag);
 		for(Object element : data)
 			out.println(element);
-		out.flush();
 	}
 
 	public static void receive() {
