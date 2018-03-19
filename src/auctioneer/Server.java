@@ -33,7 +33,7 @@ public class Server extends Application {
 		private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		final static Runnable statusNotifier = new Runnable() {
 			public void run() {
-				if(isInProgress())
+				if(isInProgress() && atLeastOneClientConnected())
 					broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex).getHighestBid());
 			}
 		};
@@ -107,7 +107,7 @@ public class Server extends Application {
 			serverStatus = ServerStatus.RUNNING;
 			scheduler.schedule(new Runnable() {
 				public void run() { statusNotifierHandle.cancel(true); }
-			}, 60 * 60 * broadcastUpdateInterval, TimeUnit.SECONDS);
+			}, (long)(36000 * broadcastUpdateInterval), TimeUnit.MILLISECONDS);
 			return true;
 		}
 		catch(IOException e) {
@@ -147,9 +147,10 @@ public class Server extends Application {
 			client.send(tag, data);
 	}
 
-	public static void removeClient(ClientHandler client) { clientsQueue.remove(client); }
-
-	public static void addDisconnected(ClientHandler client) { disconnectedClients.add(client); }
+	public static void removeClient(ClientHandler client) {
+		disconnectedClients.add(client);
+		clientsQueue.remove(client);
+	}
 
 	public static void println(String data) { Utility.println("[SERVER]> " + data); }
 

@@ -40,10 +40,6 @@ public class ClientHandler extends Thread {
 	}
 
 	public void start() {
-		
-	}
-
-	public void run() {
 		while(disconnectionDate == null)
 			receive();
 	}
@@ -91,9 +87,7 @@ public class ClientHandler extends Thread {
 					send(Protocol.serverTags.HIGHEST_UPDATE, Server.getHighestBid().getKey(), Server.getHighestBid().getValue());
 					break;
 				case CLOSE_CONNECTION:
-					Server.addDisconnected(this);
-					Server.removeClient(this);
-					disconnectionDate = Utility.getDate();
+					terminate();
 					println(tag.toString() + " : closing client_" + id + " connection on " + disconnectionDate);
 					break;
 				case ERROR:
@@ -106,6 +100,7 @@ public class ClientHandler extends Thread {
 		}
 		catch(IOException e) {
 			e.printStackTrace();
+			terminate();
 		}
 		yield();
 	}
@@ -113,4 +108,14 @@ public class ClientHandler extends Thread {
 	public int getClientId() { return id; }
 
 	public void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
+
+	public void terminate() {
+		try {
+			socket.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Server.removeClient(this);
+		disconnectionDate = Utility.getDate();
+	}
 }
