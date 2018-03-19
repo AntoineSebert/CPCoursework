@@ -107,7 +107,7 @@ public class Server extends Application {
 			serverStatus = ServerStatus.RUNNING;
 			scheduler.schedule(new Runnable() {
 				public void run() { statusNotifierHandle.cancel(true); }
-			}, 60 * 60, TimeUnit.SECONDS);
+			}, 60 * 60 * broadcastUpdateInterval, TimeUnit.SECONDS);
 			return true;
 		}
 		catch(IOException e) {
@@ -222,8 +222,28 @@ public class Server extends Application {
 		// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
 		
 		//parcourir clients queue
-		// écrire date connexion
+		for(ClientHandler client : clientsQueue) {
+			//println(client.get)
+		}
+		// afficher date connexion
 		// si client.getsate = thread.state.terminated
 			// écrire date déconnexion
+	}
+
+	public static int connectedClients() {
+		int count = 0;
+		for(ClientHandler client : clientsQueue) {
+			if(client.getState() != Thread.State.TERMINATED)
+				count++;
+		}
+		return count;
+	}
+
+	public static boolean atLeastOneClientConnected() {
+		for(ClientHandler client : clientsQueue) {
+			if(client.getState() != Thread.State.TERMINATED)
+				return true;
+		}
+		return false;
 	}
 }
