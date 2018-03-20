@@ -30,6 +30,7 @@ public class Server extends Application {
 		private static String serverStartDate;
 		private static ServerStatus serverStatus = ServerStatus.STOPPED;
 		private static ServerSocket serverSocket;
+		private static double broadcastUpdateInterval = 1.0;
 		private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		final static Runnable statusNotifier = new Runnable() {
 			public void run() {
@@ -44,8 +45,6 @@ public class Server extends Application {
 	// auction
 		private static int currentAuctionIndex = -1;
 		private static ArrayList<Auction> auctions = new ArrayList<Auction>();
-	// other
-		private static double broadcastUpdateInterval = 1.0;
 		private static boolean automaticProcess = true;
 
 	public static void main(String[] args) {
@@ -148,7 +147,7 @@ public class Server extends Application {
 			client.send(tag, data);
 	}
 
-	public static void removeClient(ClientHandler client) {
+	public static synchronized void removeClient(ClientHandler client) {
 		disconnectedClients.add(client);
 		clientsQueue.remove(client);
 	}
@@ -179,7 +178,7 @@ public class Server extends Application {
 			println("There is no next auction");
 	}
 
-	public static void addBid(ClientHandler client, int amount) {
+	public static synchronized void addBid(ClientHandler client, int amount) {
 		if(!isInProgress()) {
 			println("No auction is in progress, cannot add bid from client " + client.getId());
 			return;
@@ -192,7 +191,7 @@ public class Server extends Application {
 		auctions.get(currentAuctionIndex).addBid(client.getClientId(), amount);
 	}
 
-	public static Duration getTimeRemaining() {
+	public static synchronized Duration getTimeRemaining() {
 		if(!isInProgress()) {
 			println("No auction is progress, cannot get time remaining");
 			return null;
@@ -200,7 +199,7 @@ public class Server extends Application {
 		return Utility.difference(auctions.get(currentAuctionIndex).getDeadline(), Utility.getDate());
 	}
 
-	public static String[] getProductInfo() {
+	public static synchronized String[] getProductInfo() {
 		if(!isInProgress()) {
 			println("No auction is progress, cannot get product information");
 			return null;
@@ -212,13 +211,13 @@ public class Server extends Application {
 		};
 	}
 
-	public static boolean isInProgress() {
+	public static synchronized boolean isInProgress() {
 		if(currentAuctionIndex == -1)
 			return false;
 		return !auctions.get(currentAuctionIndex).isDealineOver();
 	}
 
-	public static Map.Entry<Integer, Integer> getHighestBid() { return auctions.get(currentAuctionIndex).getHighestBid(); }
+	public static synchronized Map.Entry<Integer, Integer> getHighestBid() { return auctions.get(currentAuctionIndex).getHighestBid(); }
 
 	public static void connectionsInfo() {
 		// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
