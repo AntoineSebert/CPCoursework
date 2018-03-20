@@ -221,14 +221,11 @@ public class Server extends Application {
 
 	public static void connectionsInfo() {
 		// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
-		
-		//parcourir clients queue
 		for(ClientHandler client : clientsQueue) {
-			//println(client.get)
+			println(client.getConnectionDate().toString());
+			if(client.getState() == Thread.State.TERMINATED)
+				println(client.getDisconnectionDate().toString());
 		}
-		// afficher date connexion
-		// si client.getsate = thread.state.terminated
-			// écrire date déconnexion
 	}
 
 	public static int connectedClients() {
