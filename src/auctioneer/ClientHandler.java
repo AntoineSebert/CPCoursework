@@ -11,7 +11,7 @@ import common.Protocol;
 import common.Utility;
 
 public class ClientHandler extends Thread {
-	// attributes
+	/* attributes */
 		// static
 			static public int totalClients = 0;
 		// connection
@@ -22,7 +22,7 @@ public class ClientHandler extends Thread {
 			private int id;
 			private ZonedDateTime connectionDate;
 			private ZonedDateTime disconnectionDate = null;
-	// members
+	/* members */
 		// constructor
 			public ClientHandler(Socket newSocket, int id) {
 				connectionDate = Utility.getDate();

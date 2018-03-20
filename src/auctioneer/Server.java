@@ -52,6 +52,7 @@ public class Server extends Application {
 		Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 		//launch(args);
 		if (start()) {
+			broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 			addAuction();
 			nextAuction();
 			while (true) {
