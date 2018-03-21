@@ -75,7 +75,7 @@ public class Server extends Application {
 						catch(IOException e) {
 							e.printStackTrace();
 						}
-						clientsQueue.add(worker);
+						clientsQueue.add(new AtomicReference<ClientHandler>(worker));
 						worker.start();
 						try {
 							worker.join();
@@ -131,11 +131,11 @@ public class Server extends Application {
 			}
 			private static void stopServer() {
 				serverStatus = ServerStatus.STOPPED;
-				for(ClientHandler client : clientsQueue) {
-					client.send(Protocol.serverTags.CLOSE_CONNECTION);
-					println("Closing connection with client " + client.getId());
+				for(AtomicReference<ClientHandler> client : clientsQueue) {
+					client.get().send(Protocol.serverTags.CLOSE_CONNECTION);
+					println("Closing connection with client " + client.get().getId());
 					try {
-						client.join();
+						client.get().join();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -154,8 +154,8 @@ public class Server extends Application {
 					println(tag + " cannot be broadcasted");
 					return;
 				}
-				for(ClientHandler client : clientsQueue)
-					client.send(tag, data);
+				for(AtomicReference<ClientHandler> client : clientsQueue)
+					client.get().send(tag, data);
 			}
 		// modifiers
 			public static synchronized void removeClient(ClientHandler client) {
@@ -190,7 +190,7 @@ public class Server extends Application {
 					return;
 				}
 				if (amount < auctions.get(currentAuctionIndex).getHighestBid().getKey())
-					clientsQueue.get(clientsQueue.indexOf(client)).send(
+					clientsQueue.get(clientsQueue.indexOf(client)).get().send(
 						Protocol.serverTags.ERROR,
 						"The bid must be higher than the actual highest bid."
 					);
@@ -217,8 +217,8 @@ public class Server extends Application {
 			}
 			private static int connectedClients() {
 				int count = 0;
-				for(ClientHandler client : clientsQueue) {
-					if(client.getState() != Thread.State.TERMINATED)
+				for(AtomicReference<ClientHandler> client : clientsQueue) {
+					if(client.get().getState() != Thread.State.TERMINATED)
 						count++;
 				}
 				return count;
@@ -231,8 +231,8 @@ public class Server extends Application {
 				return !auctions.get(currentAuctionIndex).isDealineOver();
 			}
 			private static boolean atLeastOneClientConnected() {
-				for(ClientHandler client : clientsQueue) {
-					if(client.getState() != Thread.State.TERMINATED)
+				for(AtomicReference<ClientHandler> client : clientsQueue) {
+					if(client.get().getState() != Thread.State.TERMINATED)
 						return true;
 				}
 				return false;
@@ -241,10 +241,10 @@ public class Server extends Application {
 			private static void println(String data) { Utility.println("[SERVER]> " + data); }
 			private static void connectionsInfo() {
 				// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
-				for(ClientHandler client : clientsQueue) {
-					println(client.getConnectionDate().toString());
-					if(client.getState() == Thread.State.TERMINATED)
-						println(client.getDisconnectionDate().toString());
+				for(AtomicReference<ClientHandler> client : clientsQueue) {
+					println(client.get().getConnectionDate().toString());
+					if(client.get().getState() == Thread.State.TERMINATED)
+						println(client.get().getDisconnectionDate().toString());
 				}
 			}
 }

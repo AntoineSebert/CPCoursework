@@ -66,7 +66,7 @@ public class ClientHandler extends Thread {
 					out.println(element);
 				yield();
 			}
-			public void receive() {
+			private void receive() {
 				try {
 					Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
 					switch(tag) {
@@ -105,7 +105,7 @@ public class ClientHandler extends Thread {
 				}
 				yield();
 			}
-			public void terminate() {
+			private void terminate() {
 				println("Terminating client handler");
 				try {
 					socket.close();
@@ -120,5 +120,5 @@ public class ClientHandler extends Thread {
 			public ZonedDateTime getConnectionDate() { return connectionDate; }
 			public ZonedDateTime getDisconnectionDate() { return disconnectionDate; }
 		// display
-			public void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
+			private void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
 }
