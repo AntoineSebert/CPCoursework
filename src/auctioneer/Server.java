@@ -48,16 +48,12 @@ public class Server extends Application {
 			};
 			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(statusNotifier, 1, 1, TimeUnit.SECONDS);
 		// clients
-			//
 			private static ArrayList<AtomicReference<ClientHandler>> clientsQueue = new ArrayList<AtomicReference<ClientHandler>>();
-			private static ArrayList<ClientHandler> disconnectedClients = new ArrayList<ClientHandler>();
-			//
+			private static ArrayList<AtomicReference<ClientHandler>> disconnectedClients = new ArrayList<AtomicReference<ClientHandler>>();
 			private static ReentrantLock myLock = new ReentrantLock(true);
 		// auction
-			//
 			private static ArrayList<Auction> auctions = new ArrayList<Auction>();
 			private static AtomicInteger currentAuctionIndex = new AtomicInteger(-1);
-			//
 			private static boolean automaticProcess = true;
 	/* methods */
 		// main
@@ -159,9 +155,14 @@ public class Server extends Application {
 					client.get().send(tag, data);
 			}
 		// modifiers
-			public static synchronized void removeClient(ClientHandler client) {
-				disconnectedClients.add(client);
-				clientsQueue.remove(client);
+			public static synchronized void removeClient(ClientHandler myClient) {
+				disconnectedClients.add(new AtomicReference<ClientHandler>(myClient));
+				for(AtomicReference<ClientHandler> client : clientsQueue) {
+					if(client.get() == myClient) {
+						clientsQueue.remove(client);
+						break;
+					}
+				}
 			}
 			private static void addAuction() {
 				try {
@@ -203,11 +204,9 @@ public class Server extends Application {
 					return;
 				}
 				if (amount < auctions.get(currentAuctionIndex.get()).getHighestBid().getKey())
-					clientsQueue.get(clientsQueue.indexOf(client)).get().send(
-						Protocol.serverTags.ERROR,
-						"The bid must be higher than the actual highest bid."
-					);
-				auctions.get(currentAuctionIndex.get()).addBid(client.getClientId(), amount);
+					client.send(Protocol.serverTags.ERROR, "The bid must be higher than the actual highest bid.");
+				else
+					auctions.get(currentAuctionIndex.get()).addBid(client.getClientId(), amount);
 			}
 		// getters
 			public static Duration getTimeRemaining() {
@@ -238,7 +237,7 @@ public class Server extends Application {
 			}
 			public static synchronized Map.Entry<Integer, Integer> getHighestBid() {
 				return auctions.get(currentAuctionIndex.get()).getHighestBid();
-				}
+			}
 		// accessors
 			public static boolean isInProgress() {
 				if(currentAuctionIndex.get() == -1)
