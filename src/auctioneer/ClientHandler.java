@@ -23,8 +23,6 @@ public class ClientHandler extends Thread {
 			private int id;
 			private ZonedDateTime connectionDate;
 			private ZonedDateTime disconnectionDate = null;
-		// concurrency
-			ReentrantLock myLock = new ReentrantLock(true);
 	/* members */
 		// constructor
 			public ClientHandler(Socket newSocket, int id) {
@@ -108,6 +106,7 @@ public class ClientHandler extends Thread {
 				yield();
 			}
 			public void terminate() {
+				println("Terminating client handler");
 				try {
 					socket.close();
 				} catch (IOException e1) {

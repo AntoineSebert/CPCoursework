@@ -11,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import common.Auction;
 import common.Protocol;
@@ -26,6 +28,10 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Server extends Application {
+	/* TODO :
+	 * put atomic variables everywhere
+	 * changer arraylist en thread-safe CopyOnWriteArrayList
+	 * changer synchronized en lock */
 	/* attributes */
 		// server
 			private static String serverStartDate;
@@ -41,11 +47,16 @@ public class Server extends Application {
 			};
 			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(statusNotifier, 1, 1, TimeUnit.SECONDS);
 		// clients
-			private static ArrayList<ClientHandler> clientsQueue = new ArrayList<ClientHandler>();
+			//
+			private static ArrayList<AtomicReference<ClientHandler>> clientsQueue = new ArrayList<AtomicReference<ClientHandler>>();
 			private static ArrayList<ClientHandler> disconnectedClients = new ArrayList<ClientHandler>();
+			//
+			ReentrantLock myLock = new ReentrantLock(true);
 		// auction
-			private static int currentAuctionIndex = -1;
+			//
 			private static ArrayList<Auction> auctions = new ArrayList<Auction>();
+			private static int currentAuctionIndex = -1;
+			//
 			private static boolean automaticProcess = true;
 	/* methods */
 		// main
@@ -118,7 +129,7 @@ public class Server extends Application {
 				}
 				return false;
 			}
-			public static void stopServer() {
+			private static void stopServer() {
 				serverStatus = ServerStatus.STOPPED;
 				for(ClientHandler client : clientsQueue) {
 					client.send(Protocol.serverTags.CLOSE_CONNECTION);
@@ -151,7 +162,7 @@ public class Server extends Application {
 				disconnectedClients.add(client);
 				clientsQueue.remove(client);
 			}
-			public static void addAuction() {
+			private static void addAuction() {
 				auctions.add(new Auction(
 					ZonedDateTime.parse("2007-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
 					ZonedDateTime.parse("2018-12-12T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
@@ -161,7 +172,7 @@ public class Server extends Application {
 				));
 				println("New auction added to queue");
 			}
-			public static void nextAuction() {
+			private static void nextAuction() {
 				if (currentAuctionIndex < auctions.size()) {
 					currentAuctionIndex++;
 					broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
@@ -204,7 +215,7 @@ public class Server extends Application {
 					auctions.get(currentAuctionIndex).getHighestBid().getValue().toString()
 				};
 			}
-			public static int connectedClients() {
+			private static int connectedClients() {
 				int count = 0;
 				for(ClientHandler client : clientsQueue) {
 					if(client.getState() != Thread.State.TERMINATED)
@@ -219,7 +230,7 @@ public class Server extends Application {
 					return false;
 				return !auctions.get(currentAuctionIndex).isDealineOver();
 			}
-			public static boolean atLeastOneClientConnected() {
+			private static boolean atLeastOneClientConnected() {
 				for(ClientHandler client : clientsQueue) {
 					if(client.getState() != Thread.State.TERMINATED)
 						return true;
@@ -227,8 +238,8 @@ public class Server extends Application {
 				return false;
 			}
 		// display
-			public static void println(String data) { Utility.println("[SERVER]> " + data); }
-			public static void connectionsInfo() {
+			private static void println(String data) { Utility.println("[SERVER]> " + data); }
+			private static void connectionsInfo() {
 				// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
 				for(ClientHandler client : clientsQueue) {
 					println(client.getConnectionDate().toString());
