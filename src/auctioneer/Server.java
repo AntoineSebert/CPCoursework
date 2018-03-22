@@ -43,7 +43,7 @@ public class Server extends Application {
 			final static Runnable statusNotifier = new Runnable() {
 				public void run() {
 					if(isInProgress() && atLeastOneClientConnected())
-						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).getHighestBid());
+						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
 				}
 			};
 			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(statusNotifier, 1, 1, TimeUnit.SECONDS);
@@ -52,7 +52,7 @@ public class Server extends Application {
 			private static ArrayList<AtomicReference<ClientHandler>> disconnectedClients = new ArrayList<AtomicReference<ClientHandler>>();
 			private static ReentrantLock myLock = new ReentrantLock(true);
 		// auction
-			private static ArrayList<Auction> auctions = new ArrayList<Auction>();
+			private static ArrayList<AtomicReference<Auction>> auctions = new ArrayList<AtomicReference<Auction>>();
 			private static AtomicInteger currentAuctionIndex = new AtomicInteger(-1);
 			private static boolean automaticProcess = true;
 	/* methods */
@@ -81,7 +81,7 @@ public class Server extends Application {
 							e.printStackTrace();
 						}
 						if(automaticProcess && currentAuctionIndex.get() != -1) {
-							if(auctions.get(currentAuctionIndex.get()).isDealineOver())
+							if(auctions.get(currentAuctionIndex.get()).get().isDealineOver())
 								nextAuction();
 						}
 					}
@@ -167,13 +167,17 @@ public class Server extends Application {
 			private static void addAuction() {
 				try {
 					myLock.lock();
-					auctions.add(new Auction(
-							ZonedDateTime.parse("2007-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
-							ZonedDateTime.parse("2018-12-12T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
-							"Memories of Green",
-							"A beautiful music from Blade Runner",
-							1982
-						));
+					auctions.add(
+						new AtomicReference<Auction>(
+								new Auction(
+									ZonedDateTime.parse("2007-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
+									ZonedDateTime.parse("2018-12-12T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
+									"Memories of Green",
+									"A beautiful music from Blade Runner",
+									1982
+								)
+						)
+					);
 						println("New auction added to queue");
 				}
 				finally {
@@ -188,7 +192,7 @@ public class Server extends Application {
 						broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
 						broadcast(
 								Protocol.serverTags.TIME_REMAINING,
-							Utility.difference(Utility.getDate(), auctions.get(currentAuctionIndex.get()).getDeadline())
+							Utility.difference(Utility.getDate(), auctions.get(currentAuctionIndex.get()).get().getDeadline())
 						);
 					}
 					else
@@ -203,10 +207,10 @@ public class Server extends Application {
 					println("No auction is in progress, cannot add bid from client " + client.getId());
 					return;
 				}
-				if (amount < auctions.get(currentAuctionIndex.get()).getHighestBid().getKey())
+				if (amount < auctions.get(currentAuctionIndex.get()).get().getHighestBid().getKey())
 					client.send(Protocol.serverTags.ERROR, "The bid must be higher than the actual highest bid.");
 				else
-					auctions.get(currentAuctionIndex.get()).addBid(client.getClientId(), amount);
+					auctions.get(currentAuctionIndex.get()).get().addBid(client.getClientId(), amount);
 			}
 		// getters
 			public static Duration getTimeRemaining() {
@@ -214,7 +218,7 @@ public class Server extends Application {
 					println("No auction is progress, cannot get time remaining");
 					return null;
 				}
-				return Utility.difference(auctions.get(currentAuctionIndex.get()).getDeadline(), Utility.getDate());
+				return Utility.difference(auctions.get(currentAuctionIndex.get()).get().getDeadline(), Utility.getDate());
 			}
 			public static String[] getProductInfo() {
 				if(!isInProgress()) {
@@ -222,9 +226,9 @@ public class Server extends Application {
 					return null;
 				}
 				return new String[] {
-					auctions.get(currentAuctionIndex.get()).getProductName(),
-					auctions.get(currentAuctionIndex.get()).getProductDescription(),
-					auctions.get(currentAuctionIndex.get()).getHighestBid().getValue().toString()
+					auctions.get(currentAuctionIndex.get()).get().getProductName(),
+					auctions.get(currentAuctionIndex.get()).get().getProductDescription(),
+					auctions.get(currentAuctionIndex.get()).get().getHighestBid().getValue().toString()
 				};
 			}
 			private static int connectedClients() {
@@ -236,13 +240,13 @@ public class Server extends Application {
 				return count;
 			}
 			public static synchronized Map.Entry<Integer, Integer> getHighestBid() {
-				return auctions.get(currentAuctionIndex.get()).getHighestBid();
+				return auctions.get(currentAuctionIndex.get()).get().getHighestBid();
 			}
 		// accessors
 			public static boolean isInProgress() {
 				if(currentAuctionIndex.get() == -1)
 					return false;
-				return !auctions.get(currentAuctionIndex.get()).isDealineOver();
+				return !auctions.get(currentAuctionIndex.get()).get().isDealineOver();
 			}
 			private static boolean atLeastOneClientConnected() {
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
