@@ -41,7 +41,7 @@ public class Server extends Application {
 			private static double broadcastUpdateInterval = 1.0;
 			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 			final static Runnable statusNotifier = new Runnable() {
-				public void run() {
+				public /*synchronized*/ void run() {
 					if(isInProgress() && atLeastOneClientConnected())
 						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
 				}
@@ -155,7 +155,7 @@ public class Server extends Application {
 					client.get().send(tag, data);
 			}
 		// modifiers
-			public static synchronized void removeClient(ClientHandler myClient) {
+			public static /*synchronized*/ void removeClient(ClientHandler myClient) {
 				disconnectedClients.add(new AtomicReference<ClientHandler>(myClient));
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
 					if(client.get() == myClient) {
@@ -165,8 +165,10 @@ public class Server extends Application {
 				}
 			}
 			private static void addAuction() {
+				/*
 				try {
 					myLock.lock();
+				*/
 					auctions.add(
 						new AtomicReference<Auction>(
 								new Auction(
@@ -179,14 +181,18 @@ public class Server extends Application {
 						)
 					);
 						println("New auction added to queue");
+				/*
 				}
 				finally {
 					myLock.unlock();
 				}
+				*/
 			}
 			private static void nextAuction() {
+				/*
 				try {
 					myLock.lock();
+					*/
 					if (currentAuctionIndex.get() < auctions.size()) {
 						currentAuctionIndex.getAndIncrement();
 						broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
@@ -197,12 +203,14 @@ public class Server extends Application {
 					}
 					else
 						println("There is no next auction");
+				/*
 				}
 				finally {
 					myLock.unlock();
 				}
+				*/
 			}
-			public static synchronized void addBid(ClientHandler client, int amount) {
+			public static /*synchronized*/ void addBid(ClientHandler client, int amount) {
 				if(!isInProgress()) {
 					println("No auction is in progress, cannot add bid from client " + client.getId());
 					return;
@@ -239,7 +247,7 @@ public class Server extends Application {
 				}
 				return count;
 			}
-			public static synchronized Map.Entry<Integer, Integer> getHighestBid() {
+			public static /*synchronized*/ Map.Entry<Integer, Integer> getHighestBid() {
 				return auctions.get(currentAuctionIndex.get()).get().getHighestBid();
 			}
 		// accessors
