@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 
 public class Client extends Application {
 	/* attributes */
+		// client
+			static private boolean mainCondition = true;
 		// server communication
 			static private Date connectionDate;
 			static Socket mySocket;
@@ -28,13 +30,13 @@ public class Client extends Application {
 	/* members */
 		// main
 			public static void main(String[] args) {
-				//launch(args);
 				if(start()) {
+					//launch(args);
 					send(Protocol.clientTags.BID_SUBMIT, 100);
-					while(true) {
+					while(mainCondition) {
 						receive();
 					}
-					//stopClient();
+					stopClient();
 				}
 			}
 		// graphic display
