@@ -45,29 +45,31 @@ public class Server {
 			private static ArrayList<AtomicReference<Auction>> auctions = new ArrayList<AtomicReference<Auction>>();
 			private static AtomicInteger currentAuctionIndex = new AtomicInteger(-1);
 			private static boolean automaticProcess = true;
+		// graphics
+			private static Thread graphicInterface;
 	/* methods */
-		// main
+		// mains
 			public static void main(String[] args) {
 				Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 				if (start()) {
-					//
-					//
+					graphicInterface = new Thread(new ServerGUI(args));
+					graphicInterface.start();
 					addAuction();
 					nextAuction();
 					while (mainCondition) {
 						ClientHandler worker = null;
 						try {
 							worker = new ClientHandler(serverSocket.accept(), ClientHandler.totalClients);
+							clientsQueue.add(new AtomicReference<ClientHandler>(worker));
+							worker.start();
+							try {
+								worker.join();
+							}
+							catch(InterruptedException e) {
+								e.printStackTrace();
+							}
 						}
 						catch(IOException e) {
-							e.printStackTrace();
-						}
-						clientsQueue.add(new AtomicReference<ClientHandler>(worker));
-						worker.start();
-						try {
-							worker.join();
-						}
-						catch(InterruptedException e) {
 							e.printStackTrace();
 						}
 						if(automaticProcess && currentAuctionIndex.get() != -1)

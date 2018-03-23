@@ -41,9 +41,7 @@ public class Client extends Application {
 			}
 		// graphic display
 			@Override
-			public void start(Stage primaryStage) throws Exception {
-			
-			}
+			public void start(Stage primaryStage) throws Exception { }
 		// connection
 			static private boolean start() {
 				connectionDate = new Date();

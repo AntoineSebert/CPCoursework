@@ -14,6 +14,7 @@ public class ServerGUI extends Application implements Runnable {
 		private String[] args;
 	/* members */
 		// constructor
+			public ServerGUI() {}
 			public ServerGUI(String[] args) {
 				this.args = args;
 			}
