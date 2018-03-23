@@ -210,28 +210,32 @@ public class Server {
 					auctions.get(currentAuctionIndex.get()).get().getHighestBid().getValue().toString()
 				};
 			}
-			private static int connectedClientsCount() {
+			private static int getConnectedClientsCount() {
 				int count = 0;
-				for(AtomicReference<ClientHandler> client : clientsQueue) {
+				for(AtomicReference<ClientHandler> client : clientsQueue)
 					if(client.get().getState() != Thread.State.TERMINATED)
 						count++;
-				}
 				return count;
+			}
+			private static ArrayList<AtomicReference<ClientHandler>> getConnectedClients() {
+				ArrayList<AtomicReference<ClientHandler>> connectedClients = new ArrayList<AtomicReference<ClientHandler>>();
+				for(AtomicReference<ClientHandler> client : clientsQueue) {
+					if(client.get().getState() != Thread.State.TERMINATED)
+						connectedClients.add(client);
+				}
+				return connectedClients;
 			}
 			public static /*synchronized*/ Map.Entry<Integer, Integer> getHighestBid() {
 				return auctions.get(currentAuctionIndex.get()).get().getHighestBid();
 			}
 		// accessors
 			public static boolean isInProgress() {
-				if(currentAuctionIndex.get() == -1)
-					return false;
-				return !auctions.get(currentAuctionIndex.get()).get().isDealineOver();
+				return (currentAuctionIndex.get() == -1 ? false : !auctions.get(currentAuctionIndex.get()).get().isDealineOver());
 			}
 			private static boolean atLeastOneClientConnected() {
-				for(AtomicReference<ClientHandler> client : clientsQueue) {
+				for(AtomicReference<ClientHandler> client : clientsQueue)
 					if(client.get().getState() != Thread.State.TERMINATED)
 						return true;
-				}
 				return false;
 			}
 		// display
@@ -241,7 +245,7 @@ public class Server {
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
 					println(client.get().getConnectionDate().toString());
 					if(client.get().getState() == Thread.State.TERMINATED)
-						println(client.get().getDisconnectionDate().toString());
+						println('\t' + client.get().getDisconnectionDate().toString());
 				}
 			}
 }
