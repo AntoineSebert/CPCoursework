@@ -53,7 +53,7 @@ public class Client extends Application {
 					in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
 					return true;
 				}
-				catch (IOException e) {
+				catch(IOException e) {
 					e.printStackTrace();
 				}
 				return false;

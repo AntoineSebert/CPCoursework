@@ -13,7 +13,7 @@ public class ServerGUI extends Application implements Runnable {
 	/* attributes */
 		private String[] args;
 	/* members */
-		// constrcutor
+		// constructor
 			public ServerGUI(String[] args) {
 				this.args = args;
 			}
@@ -21,7 +21,6 @@ public class ServerGUI extends Application implements Runnable {
 			@Override
 			public void run() {
 				launch(args);
-				
 			}
 		// javafx
 			@Override

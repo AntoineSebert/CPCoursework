@@ -23,7 +23,6 @@ public class Protocol {
 		// generic error
 		ERROR
 	}
-
 	public static enum clientTags {
 		// submitting a new bid
 		BID_SUBMIT,

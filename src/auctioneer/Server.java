@@ -70,16 +70,15 @@ public class Server {
 						catch(InterruptedException e) {
 							e.printStackTrace();
 						}
-						if(automaticProcess && currentAuctionIndex.get() != -1) {
+						if(automaticProcess && currentAuctionIndex.get() != -1)
 							if(auctions.get(currentAuctionIndex.get()).get().isDealineOver())
 								nextAuction();
-						}
 					}
 					stopServer();
 				}
 			}
 		// connection
-			protected static boolean start() {
+			private static boolean start() {
 				serverStartDate = Utility.getStringDate();
 				try {
 					serverSocket = new ServerSocket(ServerProperties.portNumber);
@@ -104,7 +103,8 @@ public class Server {
 					println("Closing connection with client " + client.get().getId());
 					try {
 						client.get().join();
-					} catch (InterruptedException e) {
+					}
+					catch(InterruptedException e) {
 						e.printStackTrace();
 					}
 					clientsQueue.remove(client);
@@ -210,24 +210,24 @@ public class Server {
 					auctions.get(currentAuctionIndex.get()).get().getHighestBid().getValue().toString()
 				};
 			}
-			private static int getConnectedClientsCount() {
+			public static int getConnectedClientsCount() {
 				int count = 0;
 				for(AtomicReference<ClientHandler> client : clientsQueue)
 					if(client.get().getState() != Thread.State.TERMINATED)
 						count++;
 				return count;
 			}
-			private static ArrayList<AtomicReference<ClientHandler>> getConnectedClients() {
+			public static ArrayList<AtomicReference<ClientHandler>> getConnectedClients() {
 				ArrayList<AtomicReference<ClientHandler>> connectedClients = new ArrayList<AtomicReference<ClientHandler>>();
-				for(AtomicReference<ClientHandler> client : clientsQueue) {
+				for(AtomicReference<ClientHandler> client : clientsQueue)
 					if(client.get().getState() != Thread.State.TERMINATED)
 						connectedClients.add(client);
-				}
 				return connectedClients;
 			}
 			public static /*synchronized*/ Map.Entry<Integer, Integer> getHighestBid() {
 				return auctions.get(currentAuctionIndex.get()).get().getHighestBid();
 			}
+			public static ServerStatus getStatus() { return serverStatus; }
 		// accessors
 			public static boolean isInProgress() {
 				return (currentAuctionIndex.get() == -1 ? false : !auctions.get(currentAuctionIndex.get()).get().isDealineOver());
