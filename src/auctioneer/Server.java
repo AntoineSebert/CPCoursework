@@ -20,15 +20,8 @@ import common.Protocol;
 import common.ServerProperties;
 import common.ServerStatus;
 import common.Utility;
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
-public class Server extends Application {
+public class Server {
 	/* TODO :
 	 * put atomic variables everywhere
 	 * changer arraylist en thread-safe CopyOnWriteArrayList
@@ -60,7 +53,8 @@ public class Server extends Application {
 			public static void main(String[] args) {
 				Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 				if (start()) {
-					launch(args);
+					//
+					//
 					broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 					addAuction();
 					nextAuction();
@@ -87,23 +81,6 @@ public class Server extends Application {
 					}
 					//stop();
 				}
-			}
-		// graphic display
-			@Override
-			public void start(Stage primaryStage) throws Exception {
-				primaryStage.setTitle("auctioneer");
-				Button btn = new Button();
-				btn.setText("Invoke Satan");
-				btn.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						println("Server started on " + serverStartDate);
-					}
-				});
-				StackPane root = new StackPane();
-				root.getChildren().add(btn);
-				primaryStage.setScene(new Scene(root, 300, 250));
-				primaryStage.show();
 			}
 		// connection
 			protected static boolean start() {
