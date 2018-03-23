@@ -59,8 +59,8 @@ public class Server extends Application {
 		// main
 			public static void main(String[] args) {
 				Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
-				//launch(args);
 				if (start()) {
+					launch(args);
 					broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 					addAuction();
 					nextAuction();
@@ -91,7 +91,6 @@ public class Server extends Application {
 		// graphic display
 			@Override
 			public void start(Stage primaryStage) throws Exception {
-				/*
 				primaryStage.setTitle("auctioneer");
 				Button btn = new Button();
 				btn.setText("Invoke Satan");
@@ -105,7 +104,6 @@ public class Server extends Application {
 				root.getChildren().add(btn);
 				primaryStage.setScene(new Scene(root, 300, 250));
 				primaryStage.show();
-				 */
 			}
 		// connection
 			protected static boolean start() {
@@ -172,7 +170,7 @@ public class Server extends Application {
 					auctions.add(
 						new AtomicReference<Auction>(
 								new Auction(
-									ZonedDateTime.parse("2007-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
+									ZonedDateTime.parse("2017-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
 									ZonedDateTime.parse("2018-12-12T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
 									"Memories of Green",
 									"A beautiful music from Blade Runner",
