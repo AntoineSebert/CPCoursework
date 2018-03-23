@@ -22,12 +22,9 @@ import common.ServerStatus;
 import common.Utility;
 
 public class Server {
-	/* TODO :
-	 * put atomic variables everywhere
-	 * changer arraylist en thread-safe CopyOnWriteArrayList
-	 * changer synchronized en lock */
 	/* attributes */
 		// server
+			private static boolean mainCondition = true;
 			private static String serverStartDate;
 			private static ServerStatus serverStatus = ServerStatus.STOPPED;
 			private static ServerSocket serverSocket;
@@ -55,10 +52,9 @@ public class Server {
 				if (start()) {
 					//
 					//
-					broadcast(Protocol.serverTags.SERVER_STATUS, serverStatus);
 					addAuction();
 					nextAuction();
-					while (true) {
+					while (mainCondition) {
 						ClientHandler worker = null;
 						try {
 							worker = new ClientHandler(serverSocket.accept(), ClientHandler.totalClients);
@@ -79,7 +75,7 @@ public class Server {
 								nextAuction();
 						}
 					}
-					//stop();
+					stopServer();
 				}
 			}
 		// connection
@@ -214,7 +210,7 @@ public class Server {
 					auctions.get(currentAuctionIndex.get()).get().getHighestBid().getValue().toString()
 				};
 			}
-			private static int connectedClients() {
+			private static int connectedClientsCount() {
 				int count = 0;
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
 					if(client.get().getState() != Thread.State.TERMINATED)
