@@ -9,7 +9,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
 
@@ -39,8 +38,7 @@ public class ServerGUI extends Application implements Runnable {
 					}
 				});
 				root.getChildren().add(btn);
-				//
-				root.getChildren().add(createImmutableTextField(Utility.getStringDate(), 0, 0));
+				root.getChildren().add(createImmutableTextField(Utility.getStringDate(), 1, 1));
 				root.getChildren().add(createImmutableTextField(Server.getTimeRemaining().toString(), 100, 100));
 				root.getChildren().add(createButton("Start/Stop", new EventHandler<ActionEvent>() {
 					@Override
@@ -63,10 +61,9 @@ public class ServerGUI extends Application implements Runnable {
 						Server.broadcast(Protocol.serverTags.TIME_REMAINING, Server.getTimeRemaining());
 					}
 				}));
-				root.getChildren().add(createImmutableTextField(Server.getHighestBid().getKey().toString(), 0, 0));
-				root.getChildren().add(createImmutableTextField(Server.getHighestBid().getValue().toString(), 0, 0));
+				root.getChildren().add(createImmutableTextField((Server.getHighestBid().getKey().toString()), 1, 1));
+				root.getChildren().add(createImmutableTextField(Server.getHighestBid().getValue().toString(), 1, 1));
 				root.getChildren().add(createImmutableTextField("Console", 0, 0));
-				//
 				primaryStage.setScene(new Scene(root, 600, 600));
 				primaryStage.show();
 			}
@@ -88,7 +85,7 @@ public class ServerGUI extends Application implements Runnable {
 			private Button createButton(String text, EventHandler<ActionEvent> action) {
 				Button newButton = new Button(text);
 				newButton.setOnAction(action);
-				return new Button();
+				return newButton;
 			}
 		// display
 			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }

@@ -93,7 +93,7 @@ public class Client extends Application {
 							break;
 						case PRODUCT_DESCRIPTION:
 							println("The product is :");
-							println('\t' + in.readLine() + "\n\t" +  in.readLine() + "\n\t" +  in.readLine() + '\n');
+							println('\t' + in.readLine() + "\n\t\t\t" +  in.readLine() + "\n\t\t\t" +  in.readLine() + '\n');
 							break;
 						case TIME_REMAINING:
 							println("Time remaining : " + in.readLine());
