@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
 
 public class ServerGUI extends Application implements Runnable {
@@ -29,7 +30,7 @@ public class ServerGUI extends Application implements Runnable {
 			@Override
 			public void start(Stage primaryStage) throws Exception {
 				primaryStage.setTitle("auctioneer");
-				StackPane root = new StackPane();
+				TilePane root = new TilePane();
 				Button btn = new Button("Invoke Satan");
 				btn.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
@@ -66,7 +67,7 @@ public class ServerGUI extends Application implements Runnable {
 				root.getChildren().add(createImmutableTextField(Server.getHighestBid().getValue().toString(), 0, 0));
 				root.getChildren().add(createImmutableTextField("Console", 0, 0));
 				//
-				primaryStage.setScene(new Scene(root, 300, 250));
+				primaryStage.setScene(new Scene(root, 600, 600));
 				primaryStage.show();
 			}
 		// javafx components
