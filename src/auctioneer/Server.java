@@ -119,7 +119,7 @@ public class Server {
 					e.printStackTrace();
 				}
 			}
-			private static void broadcast(Protocol.serverTags tag, Object... data) {
+			public static void broadcast(Protocol.serverTags tag, Object... data) {
 				if(tag == Protocol.serverTags.NOT_HIGHER || tag == Protocol.serverTags.SEND_ID) {
 					println(tag + " cannot be broadcasted");
 					return;
