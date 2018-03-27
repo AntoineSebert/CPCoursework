@@ -24,7 +24,6 @@ import common.Utility;
 public class Server {
 	/* attributes */
 		// server
-			private static boolean mainCondition = true;
 			private static String serverStartDate;
 			private static ServerStatus serverStatus = ServerStatus.STOPPED;
 			private static ServerSocket serverSocket;
@@ -56,7 +55,7 @@ public class Server {
 					graphicInterface.start();
 					addAuction();
 					nextAuction();
-					while (mainCondition) {
+					while (serverStatus == ServerStatus.RUNNING) {
 						ClientHandler worker = null;
 						try {
 							worker = new ClientHandler(serverSocket.accept(), ClientHandler.totalClients);
@@ -70,13 +69,14 @@ public class Server {
 							}
 						}
 						catch(IOException e) {
+							if(e.getMessage() == "socket closed")
+								println(e.getMessage());
 							e.printStackTrace();
 						}
 						if(automaticProcess && currentAuctionIndex.get() != -1)
 							if(auctions.get(currentAuctionIndex.get()).get().isDealineOver())
 								nextAuction();
 					}
-					stopServer();
 				}
 			}
 		// connection
@@ -98,18 +98,18 @@ public class Server {
 				}
 				return false;
 			}
-			private static void stopServer() {
+			public static void stopServer() {
 				serverStatus = ServerStatus.STOPPED;
+				println(String.valueOf(clientsQueue.size()));
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
-					client.get().send(Protocol.serverTags.CLOSE_CONNECTION);
 					println("Closing connection with client " + client.get().getId());
+					client.get().terminate();
 					try {
 						client.get().join();
 					}
 					catch(InterruptedException e) {
 						e.printStackTrace();
 					}
-					clientsQueue.remove(client);
 				}
 				try {
 					serverSocket.close();

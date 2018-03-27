@@ -88,7 +88,6 @@ public class ClientHandler extends Thread {
 							break;
 						case CLOSE_CONNECTION:
 							terminate();
-							println(tag.toString() + " : closing client_" + id + " connection on " + disconnectionDate);
 							break;
 						case ERROR:
 							println(tag.toString() + " : " + in.readLine());
@@ -104,15 +103,19 @@ public class ClientHandler extends Thread {
 				}
 				yield();
 			}
-			private void terminate() {
-				println("Terminating client handler");
+			public void terminate() {
+				println("Closing client_" + id + " connection on " + disconnectionDate);
+				send(Protocol.serverTags.CLOSE_CONNECTION);
 				try {
 					socket.close();
-				} catch (IOException e1) {
+				}
+				catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				Server.removeClient(this);
-				disconnectionDate = Utility.getDate();
+				finally {
+					Server.removeClient(this);
+					disconnectionDate = Utility.getDate();
+				}
 			}
 		// getters
 			public int getClientId() { return id; }

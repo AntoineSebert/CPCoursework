@@ -46,7 +46,7 @@ public class ServerGUI extends Application implements Runnable {
 				// LEFT
 					VBox productPanel = new VBox();
 					productPanel.getChildren().addAll(
-						createText("Product creation\n", 200, 20.0),
+						createText("Product creation\n", 200, 20.0, TextAlignment.LEFT),
 						createEditableTextField("Name", 0, 0),
 						createEditableTextField("Description", 0, 0),
 						createEditableTextField("Price", 0, 0)
@@ -78,9 +78,9 @@ public class ServerGUI extends Application implements Runnable {
 				// RIGHT
 					VBox highestBidPanel = new VBox();
 					highestBidPanel.getChildren().addAll(
-						createText("Current highest bid\n", 200, 20.0),
-						createImmutableTextField((Server.getHighestBid().getKey().toString()), 1, 1),
-						createImmutableTextField(Server.getHighestBid().getValue().toString(), 1, 1)
+						createText("Current highest bid\n", 200, 20.0, TextAlignment.RIGHT),
+						createText(Server.getHighestBid().getKey().toString() + '\n', 200, 15.0, TextAlignment.RIGHT),
+						createText(Server.getHighestBid().getValue().toString() + '\n', 200, 15.0, TextAlignment.RIGHT)
 					);
 					root.setRight(highestBidPanel);
 				// BOTTOM
@@ -88,6 +88,8 @@ public class ServerGUI extends Application implements Runnable {
 				primaryStage.setScene(new Scene(root, 600, 600));
 				primaryStage.show();
 			}
+			@Override
+			public void stop(){ Server.stopServer(); }
 		// javafx components
 			private TextField createImmutableTextField(String content, int posx, int posy) {
 				TextField newTextField = new TextField(content);
@@ -111,11 +113,11 @@ public class ServerGUI extends Application implements Runnable {
 				
 				return newButton;
 			}
-			private Text createText(String text, int width, double fontSize) {
+			private Text createText(String text, int width, double fontSize, TextAlignment alignment) {
 				Text newText = new Text(text);
 				newText.setFont(new Font(fontSize));
 				newText.setWrappingWidth(width);
-				newText.setTextAlignment(TextAlignment.JUSTIFY);
+				newText.setTextAlignment(alignment);
 				
 				return newText;
 			}
