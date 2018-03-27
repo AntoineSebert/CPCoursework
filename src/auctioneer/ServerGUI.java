@@ -13,6 +13,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class ServerGUI extends Application implements Runnable {
@@ -43,6 +46,7 @@ public class ServerGUI extends Application implements Runnable {
 				// LEFT
 					VBox productPanel = new VBox();
 					productPanel.getChildren().addAll(
+						createText("Product creation\n", 200, 20.0),
 						createEditableTextField("Name", 0, 0),
 						createEditableTextField("Description", 0, 0),
 						createEditableTextField("Price", 0, 0)
@@ -74,6 +78,7 @@ public class ServerGUI extends Application implements Runnable {
 				// RIGHT
 					VBox highestBidPanel = new VBox();
 					highestBidPanel.getChildren().addAll(
+						createText("Current highest bid\n", 200, 20.0),
 						createImmutableTextField((Server.getHighestBid().getKey().toString()), 1, 1),
 						createImmutableTextField(Server.getHighestBid().getValue().toString(), 1, 1)
 					);
@@ -89,6 +94,7 @@ public class ServerGUI extends Application implements Runnable {
 				newTextField.setEditable(false);
 				newTextField.setLayoutX(posx);
 				newTextField.setLayoutY(posy);
+				
 				return newTextField;
 			}
 			private TextField createEditableTextField(String hint, int posx, int posy) {
@@ -96,12 +102,22 @@ public class ServerGUI extends Application implements Runnable {
 				newTextField.setPromptText(hint);
 				newTextField.setLayoutX(posx);
 				newTextField.setLayoutY(posy);
+				
 				return newTextField;
 			}
 			private Button createButton(String text, EventHandler<ActionEvent> action) {
 				Button newButton = new Button(text);
 				newButton.setOnAction(action);
+				
 				return newButton;
+			}
+			private Text createText(String text, int width, double fontSize) {
+				Text newText = new Text(text);
+				newText.setFont(new Font(fontSize));
+				newText.setWrappingWidth(width);
+				newText.setTextAlignment(TextAlignment.JUSTIFY);
+				
+				return newText;
 			}
 		// display
 			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }
