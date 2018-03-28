@@ -31,6 +31,7 @@ public class Server {
 			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 			final static Runnable statusNotifier = new Runnable() {
 				public /*synchronized*/ void run() {
+					ServerGUI.updateTime();
 					if(isInProgress() && atLeastOneClientConnected())
 						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
 				}
@@ -56,28 +57,23 @@ public class Server {
 					addAuction();
 					nextAuction();
 					while (serverStatus == ServerStatus.RUNNING) {
-						ClientHandler worker = null;
+						if(graphicInterface.getState() == Thread.State.TERMINATED)
+							stopServer();
 						try {
-							worker = new ClientHandler(serverSocket.accept(), ClientHandler.totalClients);
+							ClientHandler worker = new ClientHandler(serverSocket.accept(), ClientHandler.totalClients);
 							clientsQueue.add(new AtomicReference<ClientHandler>(worker));
 							worker.start();
-							try {
-								worker.join();
-							}
-							catch(InterruptedException e) {
-								e.printStackTrace();
-							}
 						}
 						catch(IOException e) {
-							if(e.getMessage() == "socket closed")
-								println(e.getMessage());
-							e.printStackTrace();
+							if(!e.getMessage().equals("socket closed") && !e.getMessage().equals("socket is closed"))
+								e.printStackTrace();
 						}
 						if(automaticProcess && currentAuctionIndex.get() != -1)
 							if(auctions.get(currentAuctionIndex.get()).get().isDealineOver())
 								nextAuction();
 					}
 				}
+				println("finishing...");
 			}
 		// connection
 			private static boolean start() {
@@ -99,25 +95,41 @@ public class Server {
 				return false;
 			}
 			public static void stopServer() {
-				serverStatus = ServerStatus.STOPPED;
-				println(String.valueOf(clientsQueue.size()));
-				for(AtomicReference<ClientHandler> client : clientsQueue) {
-					println("Closing connection with client " + client.get().getId());
-					client.get().terminate();
+				// change status
+					serverStatus = ServerStatus.STOPPED;
+				// close graphic interface
 					try {
-						client.get().join();
+						println("joining...");
+						println(graphicInterface.getState().toString());
+						graphicInterface.join();
+						println("joined");
 					}
-					catch(InterruptedException e) {
-						e.printStackTrace();
+					catch (InterruptedException e1) {
+						e1.printStackTrace();
 					}
-				}
-				try {
-					serverSocket.close();
-					println("Server stopped");
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
+					finally {
+						// close server socket
+						try {
+							serverSocket.close();
+						}
+						catch(IOException e) {
+							e.printStackTrace();
+						}
+						finally {
+							// close client handlers
+							for(AtomicReference<ClientHandler> client : clientsQueue) {
+								println("Closing connection with client " + client.get().getId());
+								client.get().terminate();
+								try {
+									client.get().join();
+								}
+								catch(InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+							println("Server stopped");
+						}
+					}
 			}
 			public static void broadcast(Protocol.serverTags tag, Object... data) {
 				if(tag == Protocol.serverTags.NOT_HIGHER || tag == Protocol.serverTags.SEND_ID) {

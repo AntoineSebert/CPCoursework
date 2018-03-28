@@ -22,6 +22,8 @@ public class ServerGUI extends Application implements Runnable {
 	/* attributes */
 		private String[] args;
 		Server parent;
+		BorderPane root;
+		static Text currentTime;
 	/* members */
 		// constructor
 			public ServerGUI() {}
@@ -35,12 +37,20 @@ public class ServerGUI extends Application implements Runnable {
 			@Override
 			public void start(Stage primaryStage) throws Exception {
 				primaryStage.setTitle("auctioneer");
-				BorderPane root = new BorderPane();
+				root = new BorderPane();
 				// TOP
 					HBox topbar = new HBox();
+					currentTime = createText("current time: " + Utility.getStringDate() + '\n', 200, 15.0, TextAlignment.LEFT);
 					topbar.getChildren().addAll(
-						createImmutableTextField(Utility.getStringDate(), 1, 1),
-						createImmutableTextField(Server.getTimeRemaining().toString(), 100, 100)
+						currentTime,
+						createText(
+							"days " + Server.getTimeRemaining().toDays()
+							+ " hours: " + Server.getTimeRemaining().toHours() % 24
+							+ " minutes: " + Server.getTimeRemaining().toMinutes() % 60
+							+ " seconds: " + Server.getTimeRemaining().toSeconds() % 60
+							+ '\n',
+							200, 15.0, TextAlignment.LEFT
+						)
 					);
 					root.setTop(topbar);
 				// LEFT
@@ -89,9 +99,18 @@ public class ServerGUI extends Application implements Runnable {
 				primaryStage.show();
 			}
 			@Override
-			public void stop(){ Server.stopServer(); }
+			public void stop() {
+				println("Closing user interface...");
+				try {
+					super.stop();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				println("User interface closed");
+			}
 		// javafx components
-			private TextField createImmutableTextField(String content, int posx, int posy) {
+			static private TextField createImmutableTextField(String content, int posx, int posy) {
 				TextField newTextField = new TextField(content);
 				newTextField.setEditable(false);
 				newTextField.setLayoutX(posx);
@@ -99,7 +118,7 @@ public class ServerGUI extends Application implements Runnable {
 				
 				return newTextField;
 			}
-			private TextField createEditableTextField(String hint, int posx, int posy) {
+			static private TextField createEditableTextField(String hint, int posx, int posy) {
 				TextField newTextField = new TextField();
 				newTextField.setPromptText(hint);
 				newTextField.setLayoutX(posx);
@@ -107,19 +126,23 @@ public class ServerGUI extends Application implements Runnable {
 				
 				return newTextField;
 			}
-			private Button createButton(String text, EventHandler<ActionEvent> action) {
+			static private Button createButton(String text, EventHandler<ActionEvent> action) {
 				Button newButton = new Button(text);
 				newButton.setOnAction(action);
 				
 				return newButton;
 			}
-			private Text createText(String text, int width, double fontSize, TextAlignment alignment) {
+			static private Text createText(String text, int width, double fontSize, TextAlignment alignment) {
 				Text newText = new Text(text);
 				newText.setFont(new Font(fontSize));
 				newText.setWrappingWidth(width);
 				newText.setTextAlignment(alignment);
 				
 				return newText;
+			}
+		// server-side events
+			static public void updateTime() {
+				currentTime = createText("current time: " + Utility.getStringDate() + '\n', 200, 15.0, TextAlignment.LEFT);
 			}
 		// display
 			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }
