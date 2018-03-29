@@ -56,18 +56,25 @@ public class ServerGUI extends Application implements Runnable {
 					root.setTop(topbar);
 				// LEFT
 					productPanel.getChildren().addAll(
-						createText("Product creation\n", 200, 20.0, TextAlignment.LEFT),
-						createEditableTextField("Name", 0, 0),
-						createEditableTextField("Description", 0, 0),
-						createEditableTextField("Price", 0, 0),
+						createText("Product creation\n", 300, 20.0, TextAlignment.LEFT),
+						createEditableTextField("Name"),
+						createEditableTextField("Description"),
+						createEditableTextField("Price"),
+						createEditableTextField("Start datetime " + "yyyy/MM/dd HH:mm:ss"),
+						createEditableTextField("End datetime " + "yyyy/MM/dd HH:mm:ss"),
 						createButton("Add auction", new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
-								/*
-								Server.addAuction(
-									((TextField)productPanel.getChildren().get(1)).getText()
-								);
-								*/
+								if(checkNewAuctionFields()) {
+									Server.addAuction(
+										Utility.stringToDate(((TextField)productPanel.getChildren().get(4)).getText()),
+										Utility.stringToDate(((TextField)productPanel.getChildren().get(5)).getText()),
+										((TextField)productPanel.getChildren().get(1)).getText(),
+										((TextField)productPanel.getChildren().get(2)).getText(),
+										Integer.parseInt(((TextField)productPanel.getChildren().get(3)).getText())
+									);
+									clearNewAuctionFields();
+								}
 							}
 						})
 					);
@@ -105,7 +112,7 @@ public class ServerGUI extends Application implements Runnable {
 					);
 					root.setRight(highestBidPanel);
 				// BOTTOM
-					root.setBottom(createImmutableTextField("Console", 0, 0));
+					root.setBottom(createImmutableTextField("Console"));
 				primaryStage.setScene(new Scene(root, 1200, 600));
 				primaryStage.show();
 			}
@@ -121,19 +128,15 @@ public class ServerGUI extends Application implements Runnable {
 				println("User interface closed");
 			}
 		// javafx components
-			static private TextField createImmutableTextField(String content, int posx, int posy) {
+			static private TextField createImmutableTextField(String content) {
 				TextField newTextField = new TextField(content);
 				newTextField.setEditable(false);
-				newTextField.setLayoutX(posx);
-				newTextField.setLayoutY(posy);
 
 				return newTextField;
 			}
-			static private TextField createEditableTextField(String hint, int posx, int posy) {
+			static private TextField createEditableTextField(String hint) {
 				TextField newTextField = new TextField();
 				newTextField.setPromptText(hint);
-				newTextField.setLayoutX(posx);
-				newTextField.setLayoutY(posy);
 
 				return newTextField;
 			}
@@ -164,6 +167,21 @@ public class ServerGUI extends Application implements Runnable {
 			public static void updateHighestBid() {
 				((Text)highestBidPanel.getChildren().get(1)).setText(Server.getHighestBid().getKey().toString());
 				((Text)highestBidPanel.getChildren().get(2)).setText(Server.getHighestBid().getValue().toString());
+			}
+		// other
+			private boolean checkNewAuctionFields() {
+				return ((TextField)productPanel.getChildren().get(4)).getText() != ""
+					&& ((TextField)productPanel.getChildren().get(5)).getText() != ""
+					&& ((TextField)productPanel.getChildren().get(1)).getText() != ""
+					&& ((TextField)productPanel.getChildren().get(2)).getText() != ""
+					&& ((TextField)productPanel.getChildren().get(3)).getText() != "";
+			}
+			private void clearNewAuctionFields() {
+				((TextField)productPanel.getChildren().get(1)).clear();
+				((TextField)productPanel.getChildren().get(2)).clear();
+				((TextField)productPanel.getChildren().get(3)).clear();
+				((TextField)productPanel.getChildren().get(4)).clear();
+				((TextField)productPanel.getChildren().get(5)).clear();
 			}
 		// display
 			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }
