@@ -27,24 +27,22 @@ public class Server {
 			private static String serverStartDate;
 			private static ServerStatus serverStatus = ServerStatus.STOPPED;
 			private static ServerSocket serverSocket;
-			// background tasks
-				// broadcast highest bid
-					private static double broadcastUpdateInterval = 1.0;
-					private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-					final static Runnable statusNotifier = new Runnable() {
-						public /*synchronized*/ void run() {
-							ServerGUI.updateTime();
-							if(isInProgress() && atLeastOneClientConnected())
-								broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
-						}
-					};
-					final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(
-						statusNotifier,
-						1,
-						(long) broadcastUpdateInterval,
-						TimeUnit.SECONDS
-					);
-				// update display
+		// background task
+			private static double broadcastUpdateInterval = 1.0;
+			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+			final static Runnable statusNotifier = new Runnable() {
+				public /*synchronized*/ void run() {
+					ServerGUI.updateTime();
+					if(isInProgress() && atLeastOneClientConnected())
+						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
+				}
+			};
+			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(
+				statusNotifier,
+				1,
+				(long) broadcastUpdateInterval,
+				TimeUnit.SECONDS
+			);
 		// clients
 			private static ArrayList<AtomicReference<ClientHandler>> clientsQueue = new ArrayList<AtomicReference<ClientHandler>>();
 			private static ArrayList<AtomicReference<ClientHandler>> disconnectedClients = new ArrayList<AtomicReference<ClientHandler>>();
@@ -210,8 +208,10 @@ public class Server {
 				}
 				if (amount < auctions.get(currentAuctionIndex.get()).get().getHighestBid().getKey())
 					client.send(Protocol.serverTags.ERROR, "The bid must be higher than the actual highest bid.");
-				else
+				else {
 					auctions.get(currentAuctionIndex.get()).get().addBid(client.getClientId(), amount);
+					ServerGUI.updateHighestBid();
+				}
 			}
 		// getters
 			public static Duration getTimeRemaining() {

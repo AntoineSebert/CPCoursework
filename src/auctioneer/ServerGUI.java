@@ -1,5 +1,7 @@
 package auctioneer;
 
+import java.time.Duration;
+
 import common.Protocol;
 import common.ServerStatus;
 import common.Utility;
@@ -20,9 +22,14 @@ import javafx.stage.Stage;
 
 public class ServerGUI extends Application implements Runnable {
 	/* attributes */
-		private String[] args;
-		private BorderPane root;
-		static private Text currentTimeLabel;
+		// application
+			private String[] args;
+		// graphic elements
+			private static BorderPane root;
+			private static HBox topbar = new HBox();
+			private static VBox productPanel = new VBox();
+			private static TilePane actionsPanel = new TilePane();
+			private static VBox highestBidPanel = new VBox();
 	/* members */
 		// constructor
 			public ServerGUI() {}
@@ -38,10 +45,8 @@ public class ServerGUI extends Application implements Runnable {
 				primaryStage.setTitle("auctioneer");
 				root = new BorderPane();
 				// TOP
-					HBox topbar = new HBox();
-					currentTimeLabel = createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT);
 					topbar.getChildren().addAll(
-						currentTimeLabel,
+						createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT),
 						createText(
 							"days " + Server.getTimeRemaining().toDays()
 							+ " hours: " + Server.getTimeRemaining().toHours() % 24
@@ -53,7 +58,6 @@ public class ServerGUI extends Application implements Runnable {
 					);
 					root.setTop(topbar);
 				// LEFT
-					VBox productPanel = new VBox();
 					productPanel.getChildren().addAll(
 						createText("Product creation\n", 200, 20.0, TextAlignment.LEFT),
 						createEditableTextField("Name", 0, 0),
@@ -62,7 +66,6 @@ public class ServerGUI extends Application implements Runnable {
 					);
 					root.setLeft(productPanel);
 				// CENTER
-					TilePane actionsPanel = new TilePane();
 					actionsPanel.getChildren().addAll(
 						createButton("Start/Stop", new EventHandler<ActionEvent>() {
 							@Override
@@ -85,7 +88,6 @@ public class ServerGUI extends Application implements Runnable {
 					);
 					root.setCenter(actionsPanel);
 				// RIGHT
-					VBox highestBidPanel = new VBox();
 					highestBidPanel.getChildren().addAll(
 						createText("Current highest bid\n", 200, 20.0, TextAlignment.RIGHT),
 						createText(Server.getHighestBid().getKey().toString() + '\n', 200, 15.0, TextAlignment.RIGHT),
@@ -140,8 +142,20 @@ public class ServerGUI extends Application implements Runnable {
 				return newText;
 			}
 		// server-side events
-			static public void updateTime() {
-				currentTimeLabel.setText("current time: " + Utility.getStringDate() + '\n');
+			public static void updateTime() {
+				((Text)topbar.getChildren().get(0)).setText("current time: " + Utility.getStringDate() + '\n');
+				Duration duration = Server.getTimeRemaining().negated();
+				((Text)topbar.getChildren().get(1)).setText(
+						"days: " + duration.toDays()
+						+ " hours: " + duration.toHours() % 24
+						+ " minutes: " + duration.toMinutes() % 60
+						+ " seconds: " + duration.toSeconds() % 60
+						+ '\n'
+					);
+			}
+			public static void updateHighestBid() {
+				((Text)highestBidPanel.getChildren().get(1)).setText(Server.getHighestBid().getKey().toString());
+				((Text)highestBidPanel.getChildren().get(2)).setText(Server.getHighestBid().getValue().toString());
 			}
 		// display
 			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }
