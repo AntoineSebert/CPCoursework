@@ -82,7 +82,7 @@ public class Server {
 				println("finishing...");
 			}
 		// connection
-			private static boolean start() {
+			public static boolean start() {
 				serverStartDate = Utility.getStringDate();
 				try {
 					serverSocket = new ServerSocket(ServerProperties.portNumber);
@@ -100,7 +100,7 @@ public class Server {
 				}
 				return false;
 			}
-			public static void stopServer() {
+			public static boolean stopServer() {
 				// change status
 					serverStatus = ServerStatus.STOPPED;
 				// close graphic interface
@@ -136,6 +136,7 @@ public class Server {
 							println("Server stopped");
 						}
 					}
+				return true;
 			}
 			public static void broadcast(Protocol.serverTags tag, Object... data) {
 				if(tag == Protocol.serverTags.NOT_HIGHER || tag == Protocol.serverTags.SEND_ID) {

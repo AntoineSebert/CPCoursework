@@ -70,7 +70,10 @@ public class ServerGUI extends Application implements Runnable {
 						createButton("Start/Stop", new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
-								println((Server.getStatus() == ServerStatus.RUNNING ? "Stop" : "Start"));
+								if(Server.getStatus() == ServerStatus.RUNNING)
+									Server.stopServer();
+								else
+									Server.start();
 							}
 						}),
 						createButton("Send product info", new EventHandler<ActionEvent>() {
