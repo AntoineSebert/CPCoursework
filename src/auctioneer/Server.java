@@ -27,16 +27,24 @@ public class Server {
 			private static String serverStartDate;
 			private static ServerStatus serverStatus = ServerStatus.STOPPED;
 			private static ServerSocket serverSocket;
-			private static double broadcastUpdateInterval = 1.0;
-			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-			final static Runnable statusNotifier = new Runnable() {
-				public /*synchronized*/ void run() {
-					ServerGUI.updateTime();
-					if(isInProgress() && atLeastOneClientConnected())
-						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
-				}
-			};
-			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(statusNotifier, 1, 1, TimeUnit.SECONDS);
+			// background tasks
+				// broadcast highest bid
+					private static double broadcastUpdateInterval = 1.0;
+					private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+					final static Runnable statusNotifier = new Runnable() {
+						public /*synchronized*/ void run() {
+							ServerGUI.updateTime();
+							if(isInProgress() && atLeastOneClientConnected())
+								broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
+						}
+					};
+					final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(
+						statusNotifier,
+						1,
+						(long) broadcastUpdateInterval,
+						TimeUnit.SECONDS
+					);
+				// update display
 		// clients
 			private static ArrayList<AtomicReference<ClientHandler>> clientsQueue = new ArrayList<AtomicReference<ClientHandler>>();
 			private static ArrayList<AtomicReference<ClientHandler>> disconnectedClients = new ArrayList<AtomicReference<ClientHandler>>();

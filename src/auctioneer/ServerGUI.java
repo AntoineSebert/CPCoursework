@@ -21,9 +21,8 @@ import javafx.stage.Stage;
 public class ServerGUI extends Application implements Runnable {
 	/* attributes */
 		private String[] args;
-		Server parent;
-		BorderPane root;
-		static Text currentTime;
+		private BorderPane root;
+		static private Text currentTimeLabel;
 	/* members */
 		// constructor
 			public ServerGUI() {}
@@ -40,16 +39,16 @@ public class ServerGUI extends Application implements Runnable {
 				root = new BorderPane();
 				// TOP
 					HBox topbar = new HBox();
-					currentTime = createText("current time: " + Utility.getStringDate() + '\n', 200, 15.0, TextAlignment.LEFT);
+					currentTimeLabel = createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT);
 					topbar.getChildren().addAll(
-						currentTime,
+						currentTimeLabel,
 						createText(
 							"days " + Server.getTimeRemaining().toDays()
 							+ " hours: " + Server.getTimeRemaining().toHours() % 24
 							+ " minutes: " + Server.getTimeRemaining().toMinutes() % 60
 							+ " seconds: " + Server.getTimeRemaining().toSeconds() % 60
 							+ '\n',
-							200, 15.0, TextAlignment.LEFT
+							350, 15.0, TextAlignment.LEFT
 						)
 					);
 					root.setTop(topbar);
@@ -95,7 +94,7 @@ public class ServerGUI extends Application implements Runnable {
 					root.setRight(highestBidPanel);
 				// BOTTOM
 					root.setBottom(createImmutableTextField("Console", 0, 0));
-				primaryStage.setScene(new Scene(root, 600, 600));
+				primaryStage.setScene(new Scene(root, 1200, 600));
 				primaryStage.show();
 			}
 			@Override
@@ -115,7 +114,7 @@ public class ServerGUI extends Application implements Runnable {
 				newTextField.setEditable(false);
 				newTextField.setLayoutX(posx);
 				newTextField.setLayoutY(posy);
-				
+
 				return newTextField;
 			}
 			static private TextField createEditableTextField(String hint, int posx, int posy) {
@@ -123,13 +122,13 @@ public class ServerGUI extends Application implements Runnable {
 				newTextField.setPromptText(hint);
 				newTextField.setLayoutX(posx);
 				newTextField.setLayoutY(posy);
-				
+
 				return newTextField;
 			}
 			static private Button createButton(String text, EventHandler<ActionEvent> action) {
 				Button newButton = new Button(text);
 				newButton.setOnAction(action);
-				
+
 				return newButton;
 			}
 			static private Text createText(String text, int width, double fontSize, TextAlignment alignment) {
@@ -137,12 +136,12 @@ public class ServerGUI extends Application implements Runnable {
 				newText.setFont(new Font(fontSize));
 				newText.setWrappingWidth(width);
 				newText.setTextAlignment(alignment);
-				
+
 				return newText;
 			}
 		// server-side events
 			static public void updateTime() {
-				currentTime = createText("current time: " + Utility.getStringDate() + '\n', 200, 15.0, TextAlignment.LEFT);
+				currentTimeLabel.setText("current time: " + Utility.getStringDate() + '\n');
 			}
 		// display
 			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }
