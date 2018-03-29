@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 import common.Protocol;
 import common.Utility;
@@ -20,12 +20,12 @@ public class ClientHandler extends Thread {
 			private Socket socket;
 		// instance data
 			private int id;
-			private ZonedDateTime connectionDate;
-			private ZonedDateTime disconnectionDate = null;
+			private Date connectionDate;
+			private Date disconnectionDate = null;
 	/* members */
 		// constructor
 			public ClientHandler(Socket newSocket, int id) {
-				connectionDate = Utility.getDate();
+				connectionDate = new Date();
 				totalClients++;
 				this.id = id;
 				socket = newSocket;
@@ -114,13 +114,13 @@ public class ClientHandler extends Thread {
 				}
 				finally {
 					Server.removeClient(this);
-					disconnectionDate = Utility.getDate();
+					disconnectionDate = new Date();
 				}
 			}
 		// getters
 			public int getClientId() { return id; }
-			public ZonedDateTime getConnectionDate() { return connectionDate; }
-			public ZonedDateTime getDisconnectionDate() { return disconnectionDate; }
+			public Date getConnectionDate() { return connectionDate; }
+			public Date getDisconnectionDate() { return disconnectionDate; }
 		// display
 			private void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
 }

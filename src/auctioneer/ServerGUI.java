@@ -1,7 +1,5 @@
 package auctioneer;
 
-import java.time.Duration;
-
 import common.Protocol;
 import common.ServerStatus;
 import common.Utility;
@@ -48,10 +46,9 @@ public class ServerGUI extends Application implements Runnable {
 					topbar.getChildren().addAll(
 						createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT),
 						createText(
-							"days " + Server.getTimeRemaining().toDays()
-							+ " hours: " + Server.getTimeRemaining().toHours() % 24
-							+ " minutes: " + Server.getTimeRemaining().toMinutes() % 60
-							+ " seconds: " + Server.getTimeRemaining().toSeconds() % 60
+							" hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
+							+ " minutes: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 60))
+							+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60))
 							+ '\n',
 							350, 15.0, TextAlignment.LEFT
 						)
@@ -62,7 +59,17 @@ public class ServerGUI extends Application implements Runnable {
 						createText("Product creation\n", 200, 20.0, TextAlignment.LEFT),
 						createEditableTextField("Name", 0, 0),
 						createEditableTextField("Description", 0, 0),
-						createEditableTextField("Price", 0, 0)
+						createEditableTextField("Price", 0, 0),
+						createButton("Add auction", new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								/*
+								Server.addAuction(
+									((TextField)productPanel.getChildren().get(1)).getText()
+								);
+								*/
+							}
+						})
 					);
 					root.setLeft(productPanel);
 				// CENTER
@@ -147,14 +154,12 @@ public class ServerGUI extends Application implements Runnable {
 		// server-side events
 			public static void updateTime() {
 				((Text)topbar.getChildren().get(0)).setText("current time: " + Utility.getStringDate() + '\n');
-				Duration duration = Server.getTimeRemaining().negated();
 				((Text)topbar.getChildren().get(1)).setText(
-						"days: " + duration.toDays()
-						+ " hours: " + duration.toHours() % 24
-						+ " minutes: " + duration.toMinutes() % 60
-						+ " seconds: " + duration.toSeconds() % 60
-						+ '\n'
-					);
+					" hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
+					+ " minutes: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 60))
+					+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60))
+					+ '\n'
+				);
 			}
 			public static void updateHighestBid() {
 				((Text)highestBidPanel.getChildren().get(1)).setText(Server.getHighestBid().getKey().toString());

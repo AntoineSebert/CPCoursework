@@ -2,10 +2,8 @@ package auctioneer;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,7 +58,13 @@ public class Server {
 				if (start()) {
 					graphicInterface = new Thread(new ServerGUI(args));
 					graphicInterface.start();
-					addAuction();
+					addAuction(
+						Utility.stringToDate("2017/12/03 05:52:23"),
+						Utility.stringToDate("2018/12/03 05:52:23"),
+						"Memories of Green",
+						"A beautiful music from Blade Runner",
+						1982
+					);
 					nextAuction();
 					while (serverStatus == ServerStatus.RUNNING) {
 						if(graphicInterface.getState() == Thread.State.TERMINATED)
@@ -156,23 +160,13 @@ public class Server {
 					}
 				}
 			}
-			private static void addAuction() {
+			public static void addAuction(Date begin, Date end, String name, String description, int startPrice) {
 				/*
 				try {
 					myLock.lock();
 				*/
-					auctions.add(
-						new AtomicReference<Auction>(
-								new Auction(
-									ZonedDateTime.parse("2017-12-03T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
-									ZonedDateTime.parse("2018-12-12T10:15:30+01:00[Europe/Paris]", DateTimeFormatter.ISO_ZONED_DATE_TIME),
-									"Memories of Green",
-									"A beautiful music from Blade Runner",
-									1982
-								)
-						)
-					);
-						println("New auction added to queue");
+					auctions.add(new AtomicReference<Auction>(new Auction(begin, end, name, description, startPrice)));
+					println("New auction added to queue");
 				/*
 				}
 				finally {
@@ -189,8 +183,8 @@ public class Server {
 						currentAuctionIndex.getAndIncrement();
 						broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
 						broadcast(
-								Protocol.serverTags.TIME_REMAINING,
-							Utility.difference(Utility.getDate(), auctions.get(currentAuctionIndex.get()).get().getDeadline())
+							Protocol.serverTags.TIME_REMAINING,
+							Utility.difference(new Date(), auctions.get(currentAuctionIndex.get()).get().getDeadline(), TimeUnit.SECONDS)
 						);
 					}
 					else
@@ -215,12 +209,12 @@ public class Server {
 				}
 			}
 		// getters
-			public static Duration getTimeRemaining() {
+			public static long getTimeRemaining() {
 				if(!isInProgress()) {
 					println("No auction is progress, cannot get time remaining");
-					return null;
+					return (long) 0.0;
 				}
-				return Utility.difference(auctions.get(currentAuctionIndex.get()).get().getDeadline(), Utility.getDate());
+				return Utility.difference(auctions.get(currentAuctionIndex.get()).get().getDeadline(), new Date(), TimeUnit.SECONDS);
 			}
 			public static String[] getProductInfo() {
 				if(!isInProgress()) {
