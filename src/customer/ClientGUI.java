@@ -1,10 +1,16 @@
 package customer;
 
+import common.Protocol;
 import common.Utility;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class ClientGUI extends Application implements Runnable {
@@ -13,6 +19,7 @@ public class ClientGUI extends Application implements Runnable {
 			private String[] args;
 		// graphic elements
 			private static BorderPane root;
+			private static VBox bidPanel = new VBox();
 	/* members */
 		// constructor
 			public ClientGUI() {}
@@ -26,10 +33,22 @@ public class ClientGUI extends Application implements Runnable {
 				primaryStage.setTitle("client");
 				root = new BorderPane();
 				// TOP
-					// the time left (in seconds) to the end-of-bidding deadline
+					root.setTop(Utility.createText("Time remaining: -1", 300, 15.0, TextAlignment.LEFT));
 				// LEFT
-					// text field to allow the client to enter a new bid
-					// Button to submit a new bid 
+					bidPanel.getChildren().addAll(
+						Utility.createEditableTextField("Bid"),
+						Utility.createButton("Send bid", new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								String input = ((TextField)bidPanel.getChildren().get(0)).getText();
+								if(input != "") {
+									Client.send(Protocol.clientTags.BID_SUBMIT, input);
+									((TextField)bidPanel.getChildren().get(0)).clear();
+								}
+							}
+						})
+					);
+					root.setLeft(bidPanel);
 				// CENTER
 					// product info
 				// RIGHT
@@ -51,14 +70,12 @@ public class ClientGUI extends Application implements Runnable {
 				println("User interface closed");
 			}
 		// client-side events
-			public static void printConsole(String data) {
-				try {
-					Text console = (Text)scrollableConsole.getContent();
-					console.setText(console.getText() + '[' + Utility.getStringTime() + "]" + data + '\n');
-				}
-				catch(NullPointerException e) {
-					Utility.println("[CLIENT]> Graphic console not available");
-				}
+			public static void updateTimeRemaining(long timeRemaining) {
+				((Text)root.getTop()).setText(
+					"time remaining: hours: " + String.valueOf(Math.floor(timeRemaining / 360))
+					+ " minutes: " + String.valueOf(Math.floor(timeRemaining / 60))
+					+ " seconds: " + String.valueOf(Math.floor(timeRemaining % 60))
+				);
 			}
 		// display
 			private static void println(String data) {

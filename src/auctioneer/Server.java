@@ -31,8 +31,10 @@ public class Server {
 			final static Runnable statusNotifier = new Runnable() {
 				public /*synchronized*/ void run() {
 					ServerGUI.updateTime();
-					if(isInProgress() && atLeastOneClientConnected())
+					if(isInProgress() && atLeastOneClientConnected()) {
 						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
+						broadcast(Protocol.serverTags.TIME_REMAINING, getTimeRemaining());
+					}
 				}
 			};
 			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(

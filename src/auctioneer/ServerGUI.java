@@ -132,7 +132,7 @@ public class ServerGUI extends Application implements Runnable {
 			public static void updateTime() {
 				((Text)topbar.getChildren().get(0)).setText("current time: " + Utility.getStringDate() + '\n');
 				((Text)topbar.getChildren().get(1)).setText(
-					" hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
+					"time remaining: hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
 					+ " minutes: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 60))
 					+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60))
 					+ '\n'

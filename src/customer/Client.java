@@ -4,9 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import auctioneer.ServerGUI;
 import common.Protocol;
 import common.ServerProperties;
 import common.Utility;
@@ -19,7 +25,7 @@ public class Client extends Application {
 			static private boolean mainCondition = true;
 		// server communication
 			static private Date connectionDate;
-			static Socket mySocket;
+			static private Socket mySocket;
 			static private int id = -1;
 			static private PrintWriter out;
 			static private BufferedReader in;
@@ -27,35 +33,58 @@ public class Client extends Application {
 		// current auction
 			static private int currentHighestBidAmount;
 			static private int currentHighestBidId;
+			static private long timeRemaining = -1;
+		// graphics
+			static private Thread graphicInterface;
+		// background task
+			private static double connectionAttemptInterval = 1.0;
+			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+			final static Runnable connectionAttempt = new Runnable() {
+				public void run() {
+					if(mySocket == null) {
+						println("Connection attempt");
+						try {
+							mySocket = new Socket(ServerProperties.serverAddress, ServerProperties.portNumber);
+							println("Connection established on " + connectionDate);
+							println("Refreshing fields every " + updateInterval + " seconds");
+							out = new PrintWriter(mySocket.getOutputStream(), true);
+							in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
+						}
+						catch(IOException e) {
+							if(e.getClass() != ConnectException.class)
+								e.printStackTrace();
+						}
+					}
+				}
+			};
+			final static ScheduledFuture<?> connectionAttemptHandle = scheduler.scheduleWithFixedDelay(
+					connectionAttempt,
+				1,
+				(long) connectionAttemptInterval,
+				TimeUnit.SECONDS
+			);
 	/* members */
 		// main
 			public static void main(String[] args) {
 				if(start()) {
-					//launch(args);
-					send(Protocol.clientTags.BID_SUBMIT, 100);
-					while(mainCondition) {
+					graphicInterface = new Thread(new ClientGUI(args));
+					graphicInterface.start();
+					//send(Protocol.clientTags.BID_SUBMIT, 100);
+					while(mainCondition)
 						receive();
-					}
 					stopClient();
 				}
 			}
 		// graphic display
 			@Override
-			public void start(Stage primaryStage) throws Exception { }
+			public void start(Stage primaryStage) throws Exception {
+				scheduler.schedule(new Runnable() {
+					public void run() { connectionAttemptHandle.cancel(true); }
+				}, (long)(36000 * connectionAttemptInterval), TimeUnit.MILLISECONDS);
+			}
 		// connection
 			static private boolean start() {
 				connectionDate = new Date();
-				try {
-					mySocket = new Socket(ServerProperties.serverAddress, ServerProperties.portNumber);
-					println("Connection established on " + connectionDate);
-					println("Refreshing fields every " + updateInterval + " seconds");
-					out = new PrintWriter(mySocket.getOutputStream(), true);
-					in = new BufferedReader(new InputStreamReader(mySocket.getInputStream()));
-					return true;
-				}
-				catch(IOException e) {
-					e.printStackTrace();
-				}
 				return false;
 			}
 			private static void stopClient() {
@@ -96,7 +125,9 @@ public class Client extends Application {
 							println('\t' + in.readLine() + "\n\t\t\t" +  in.readLine() + "\n\t\t\t" +  in.readLine() + '\n');
 							break;
 						case TIME_REMAINING:
-							println("Time remaining : " + in.readLine());
+							timeRemaining = Long.parseLong(in.readLine());
+							ClientGUI.updateTimeRemaining(timeRemaining);
+							println("Time remaining : " + timeRemaining);
 							break;
 						case HIGHEST_UPDATE:
 							String[] parts = in.readLine().split("=");
