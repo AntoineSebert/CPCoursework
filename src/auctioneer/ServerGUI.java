@@ -168,6 +168,9 @@ public class ServerGUI extends Application implements Runnable {
 				((Text)highestBidPanel.getChildren().get(1)).setText(Server.getHighestBid().getKey().toString());
 				((Text)highestBidPanel.getChildren().get(2)).setText(Server.getHighestBid().getValue().toString());
 			}
+			public void printConsole(String data) {
+				((TextField)root.getBottom()).appendText('[' + Utility.getStringTime() + "]" + data);
+			}
 		// other
 			private boolean checkNewAuctionFields() {
 				return ((TextField)productPanel.getChildren().get(4)).getText() != ""
