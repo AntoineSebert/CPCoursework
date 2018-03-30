@@ -7,14 +7,12 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -44,8 +42,8 @@ public class ServerGUI extends Application implements Runnable {
 				root = new BorderPane();
 				// TOP
 					topbar.getChildren().addAll(
-						createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT),
-						createText(
+						Utility.createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT),
+						Utility.createText(
 							" hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
 							+ " minutes: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 60))
 							+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60))
@@ -56,13 +54,13 @@ public class ServerGUI extends Application implements Runnable {
 					root.setTop(topbar);
 				// LEFT
 					productPanel.getChildren().addAll(
-						createText("Product creation\n", 300, 20.0, TextAlignment.LEFT),
-						createEditableTextField("Name"),
-						createEditableTextField("Description"),
-						createEditableTextField("Price"),
-						createEditableTextField("Start datetime " + "yyyy/MM/dd HH:mm:ss"),
-						createEditableTextField("End datetime " + "yyyy/MM/dd HH:mm:ss"),
-						createButton("Add auction", new EventHandler<ActionEvent>() {
+						Utility.createText("Product creation\n", 300, 20.0, TextAlignment.LEFT),
+						Utility.createEditableTextField("Name"),
+						Utility.createEditableTextField("Description"),
+						Utility.createEditableTextField("Price"),
+						Utility.createEditableTextField("Start datetime " + "yyyy/MM/dd HH:mm:ss"),
+						Utility.createEditableTextField("End datetime " + "yyyy/MM/dd HH:mm:ss"),
+						Utility.createButton("Add auction", new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
 								if(checkNewAuctionFields()) {
@@ -81,7 +79,7 @@ public class ServerGUI extends Application implements Runnable {
 					root.setLeft(productPanel);
 				// CENTER
 					actionsPanel.getChildren().addAll(
-						createButton("Start/Stop", new EventHandler<ActionEvent>() {
+						Utility.createButton("Start/Stop", new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
 								if(Server.getStatus() == ServerStatus.RUNNING)
@@ -90,13 +88,13 @@ public class ServerGUI extends Application implements Runnable {
 									Server.start();
 							}
 						}),
-						createButton("Send product info", new EventHandler<ActionEvent>() {
+						Utility.createButton("Send product info", new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
 								Server.broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])Server.getProductInfo());
 							}
 						}),
-						createButton("Send time remaining", new EventHandler<ActionEvent>() {
+						Utility.createButton("Send time remaining", new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
 								Server.broadcast(Protocol.serverTags.TIME_REMAINING, Server.getTimeRemaining());
@@ -106,15 +104,15 @@ public class ServerGUI extends Application implements Runnable {
 					root.setCenter(actionsPanel);
 				// RIGHT
 					highestBidPanel.getChildren().addAll(
-						createText("Current highest bid\n", 200, 20.0, TextAlignment.RIGHT),
-						createText(Server.getHighestBid().getKey().toString() + '\n', 200, 15.0, TextAlignment.RIGHT),
-						createText(Server.getHighestBid().getValue().toString() + '\n', 200, 15.0, TextAlignment.RIGHT)
+						Utility.createText("Current highest bid\n", 200, 20.0, TextAlignment.RIGHT),
+						Utility.createText(Server.getHighestBid().getKey().toString() + '\n', 200, 15.0, TextAlignment.RIGHT),
+						Utility.createText(Server.getHighestBid().getValue().toString() + '\n', 200, 15.0, TextAlignment.RIGHT)
 					);
 					root.setRight(highestBidPanel);
 				// BOTTOM
 					scrollableConsole = new ScrollPane();
 					scrollableConsole.setPrefSize(600, 320);
-					scrollableConsole.setContent(createText("init\n", 500, 12, TextAlignment.LEFT));
+					scrollableConsole.setContent(Utility.createText("init\n", 500, 12, TextAlignment.LEFT));
 					root.setBottom(scrollableConsole);
 				primaryStage.setScene(new Scene(root, 1200, 600));
 				primaryStage.show();
@@ -129,27 +127,6 @@ public class ServerGUI extends Application implements Runnable {
 					e.printStackTrace();
 				}
 				println("User interface closed");
-			}
-		// javafx components
-			static private TextField createEditableTextField(String hint) {
-				TextField newTextField = new TextField();
-				newTextField.setPromptText(hint);
-
-				return newTextField;
-			}
-			static private Button createButton(String text, EventHandler<ActionEvent> action) {
-				Button newButton = new Button(text);
-				newButton.setOnAction(action);
-
-				return newButton;
-			}
-			static private Text createText(String text, int width, double fontSize, TextAlignment alignment) {
-				Text newText = new Text(text);
-				newText.setFont(new Font(fontSize));
-				newText.setWrappingWidth(width);
-				newText.setTextAlignment(alignment);
-
-				return newText;
 			}
 		// server-side events
 			public static void updateTime() {
