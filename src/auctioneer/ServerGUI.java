@@ -33,9 +33,7 @@ public class ServerGUI extends Application implements Runnable {
 	/* members */
 		// constructor
 			public ServerGUI() {}
-			public ServerGUI(String[] args) {
-				this.args = args;
-			}
+			public ServerGUI(String[] args) { this.args = args; }
 		// thread
 			@Override
 			public void run() { launch(args); }
