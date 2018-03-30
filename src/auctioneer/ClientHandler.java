@@ -122,5 +122,8 @@ public class ClientHandler extends Thread {
 			public Date getConnectionDate() { return connectionDate; }
 			public Date getDisconnectionDate() { return disconnectionDate; }
 		// display
-			private void println(String data) { Utility.println("[SERVER_" + id + "]> " + data); }
+			private void println(String data) {
+				Utility.println("[SERVER_" + id + "]> " + data);
+				ServerGUI.printConsole("[SERVER]> " + data);
+			}
 }

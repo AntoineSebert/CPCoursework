@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -28,6 +29,7 @@ public class ServerGUI extends Application implements Runnable {
 			private static VBox productPanel = new VBox();
 			private static TilePane actionsPanel = new TilePane();
 			private static VBox highestBidPanel = new VBox();
+			private static ScrollPane scrollableConsole;
 	/* members */
 		// constructor
 			public ServerGUI() {}
@@ -112,7 +114,10 @@ public class ServerGUI extends Application implements Runnable {
 					);
 					root.setRight(highestBidPanel);
 				// BOTTOM
-					root.setBottom(createImmutableTextField("Console"));
+					scrollableConsole = new ScrollPane();
+					scrollableConsole.setPrefSize(600, 320);
+					scrollableConsole.setContent(createText("init\n", 500, 12, TextAlignment.LEFT));
+					root.setBottom(scrollableConsole);
 				primaryStage.setScene(new Scene(root, 1200, 600));
 				primaryStage.show();
 			}
@@ -128,12 +133,6 @@ public class ServerGUI extends Application implements Runnable {
 				println("User interface closed");
 			}
 		// javafx components
-			static private TextField createImmutableTextField(String content) {
-				TextField newTextField = new TextField(content);
-				newTextField.setEditable(false);
-
-				return newTextField;
-			}
 			static private TextField createEditableTextField(String hint) {
 				TextField newTextField = new TextField();
 				newTextField.setPromptText(hint);
@@ -168,8 +167,14 @@ public class ServerGUI extends Application implements Runnable {
 				((Text)highestBidPanel.getChildren().get(1)).setText(Server.getHighestBid().getKey().toString());
 				((Text)highestBidPanel.getChildren().get(2)).setText(Server.getHighestBid().getValue().toString());
 			}
-			public void printConsole(String data) {
-				((TextField)root.getBottom()).appendText('[' + Utility.getStringTime() + "]" + data);
+			public static void printConsole(String data) {
+				try {
+					Text console = (Text)scrollableConsole.getContent();
+					console.setText(console.getText() + '[' + Utility.getStringTime() + "]" + data + '\n');
+				}
+				catch(NullPointerException e) {
+					Utility.println("[SERVER_UI]> Graphic console not available");
+				}
 			}
 		// other
 			private boolean checkNewAuctionFields() {
@@ -187,5 +192,8 @@ public class ServerGUI extends Application implements Runnable {
 				((TextField)productPanel.getChildren().get(5)).clear();
 			}
 		// display
-			private static void println(String data) { Utility.println("[SERVER_UI]> " + data); }
+			private static void println(String data) {
+				Utility.println("[SERVER_UI]> " + data);
+				printConsole("[SERVER_UI]> " + data);
+			}
 }

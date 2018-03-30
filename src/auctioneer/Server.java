@@ -256,7 +256,10 @@ public class Server {
 				return false;
 			}
 		// display
-			private static void println(String data) { Utility.println("[SERVER]> " + data); }
+			private static void println(String data) {
+				Utility.println("[SERVER]> " + data);
+				ServerGUI.printConsole("[SERVER]> " + data);
+			}
 			private static void connectionsInfo() {
 				// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
