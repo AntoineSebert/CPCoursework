@@ -79,7 +79,6 @@ public class ClientGUI extends Application implements Runnable {
 			}
 		// display
 			private static void println(String data) {
-				Utility.println("[CLIENT]> " + data);
-				printConsole("[CLIENT]> " + data);
+				Utility.println("[CLIENT_UI]> " + data);
 			}
 }

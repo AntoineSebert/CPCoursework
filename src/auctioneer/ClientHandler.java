@@ -109,8 +109,8 @@ public class ClientHandler extends Thread {
 				try {
 					socket.close();
 				}
-				catch (IOException e1) {
-					e1.printStackTrace();
+				catch (IOException e) {
+					e.printStackTrace();
 				}
 				finally {
 					Server.removeClient(this);

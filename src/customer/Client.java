@@ -12,7 +12,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import auctioneer.ServerGUI;
 import common.Protocol;
 import common.ServerProperties;
 import common.Utility;
@@ -58,7 +57,7 @@ public class Client extends Application {
 				}
 			};
 			final static ScheduledFuture<?> connectionAttemptHandle = scheduler.scheduleWithFixedDelay(
-					connectionAttempt,
+				connectionAttempt,
 				1,
 				(long) connectionAttemptInterval,
 				TimeUnit.SECONDS
