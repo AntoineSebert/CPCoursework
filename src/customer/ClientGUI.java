@@ -1,5 +1,6 @@
 package customer;
 
+import auctioneer.Server;
 import common.Protocol;
 import common.Utility;
 import javafx.application.Application;
@@ -8,6 +9,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -20,6 +22,7 @@ public class ClientGUI extends Application implements Runnable {
 		// graphic elements
 			private static BorderPane root;
 			private static VBox bidPanel = new VBox();
+			private static HBox topbar = new HBox();
 	/* members */
 		// constructor
 			public ClientGUI() {}
@@ -33,7 +36,17 @@ public class ClientGUI extends Application implements Runnable {
 				primaryStage.setTitle("client");
 				root = new BorderPane();
 				// TOP
-					root.setTop(Utility.createText("Time remaining: -1", 300, 15.0, TextAlignment.LEFT));
+					topbar.getChildren().addAll(
+						Utility.createText("current time: " + Utility.getStringDate() + '\n', 300, 15.0, TextAlignment.LEFT),
+						Utility.createText(
+							" hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
+							+ " minutes: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 60))
+							+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60))
+							+ '\n',
+							350, 15.0, TextAlignment.LEFT
+						)
+					);
+					root.setTop(topbar);
 				// LEFT
 					bidPanel.getChildren().addAll(
 						Utility.createEditableTextField("Bid"),

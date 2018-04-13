@@ -29,7 +29,7 @@ public class Server {
 			private static double broadcastUpdateInterval = 1.0;
 			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 			final static Runnable statusNotifier = new Runnable() {
-				public /*synchronized*/ void run() {
+				public void run() {
 					ServerGUI.updateTime();
 					if(isInProgress() && atLeastOneClientConnected()) {
 						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
