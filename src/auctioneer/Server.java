@@ -32,7 +32,11 @@ public class Server {
 				public void run() {
 					ServerGUI.updateTime();
 					if(isInProgress() && atLeastOneClientConnected()) {
-						broadcast(Protocol.serverTags.HIGHEST_UPDATE, auctions.get(currentAuctionIndex.get()).get().getHighestBid());
+						broadcast(
+							Protocol.serverTags.HIGHEST_UPDATE,
+							auctions.get(currentAuctionIndex.get()).get().getHighestBid().getKey(),
+							auctions.get(currentAuctionIndex.get()).get().getHighestBid().getValue()
+						);
 						broadcast(Protocol.serverTags.TIME_REMAINING, getTimeRemaining());
 					}
 				}

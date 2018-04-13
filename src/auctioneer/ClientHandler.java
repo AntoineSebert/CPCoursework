@@ -70,9 +70,11 @@ public class ClientHandler extends Thread {
 					Protocol.clientTags tag = Protocol.clientTags.valueOf(in.readLine());
 					switch(tag) {
 						case BID_SUBMIT:
-							String amountString = in.readLine();
-							println(tag.toString() + " received : " + amountString);
-							Server.addBid(this, Integer.parseInt(amountString));
+							int amount = Integer.parseInt(in.readLine());
+							println(tag.toString() + " received : " + amount);
+							if(Server.getHighestBid().getKey() < amount)
+								Server.broadcast(Protocol.serverTags.HIGHEST_UPDATE, amount, id);
+							Server.addBid(this, amount);
 							break;
 						case ASK_REMAINING:
 							println(tag.toString() + " received");

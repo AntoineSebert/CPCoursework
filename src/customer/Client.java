@@ -129,9 +129,8 @@ public class Client extends Application {
 							println("Time remaining : " + timeRemaining);
 							break;
 						case HIGHEST_UPDATE:
-							String[] parts = in.readLine().split("=");
-							currentHighestBidAmount = Integer.parseInt(parts[0]);
-							currentHighestBidId = Integer.parseInt(parts[1]);
+							currentHighestBidAmount = Integer.parseInt(in.readLine());
+							currentHighestBidId = Integer.parseInt(in.readLine());
 							println("Highest bid is " + currentHighestBidAmount + " from client " + currentHighestBidId );
 							break;
 						case CLOSE_BIDDING:
