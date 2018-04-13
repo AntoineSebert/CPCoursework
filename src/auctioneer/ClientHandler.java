@@ -72,8 +72,6 @@ public class ClientHandler extends Thread {
 						case BID_SUBMIT:
 							int amount = Integer.parseInt(in.readLine());
 							println(tag.toString() + " received : " + amount);
-							if(Server.getHighestBid().getKey() < amount)
-								Server.broadcast(Protocol.serverTags.HIGHEST_UPDATE, amount, id);
 							Server.addBid(this, amount);
 							break;
 						case ASK_REMAINING:
@@ -118,6 +116,7 @@ public class ClientHandler extends Thread {
 					Server.removeClient(this);
 					disconnectionDate = new Date();
 				}
+				yield();
 			}
 		// getters
 			public int getClientId() { return id; }

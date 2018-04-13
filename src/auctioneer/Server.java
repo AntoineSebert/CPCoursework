@@ -18,7 +18,11 @@ import common.Protocol;
 import common.ServerProperties;
 import common.ServerStatus;
 import common.Utility;
-
+/*
+ * @author Anthony Sébert
+ * Set a connection point, create and manage ClientHandler objects and Auction objects,
+ * update and hold a ServerGUI class, regularly notify clients about time remaining and current highest bid.
+ */
 public class Server {
 	/* attributes */
 		// server
@@ -31,6 +35,7 @@ public class Server {
 			final static Runnable statusNotifier = new Runnable() {
 				public void run() {
 					ServerGUI.updateTime();
+					// broadcast time and highest bid to clients
 					if(isInProgress() && atLeastOneClientConnected()) {
 						broadcast(
 							Protocol.serverTags.HIGHEST_UPDATE,
@@ -41,11 +46,9 @@ public class Server {
 					}
 				}
 			};
+			// running one second after initialization, calls runnable statusNotifier every 1 second (see below)
 			final static ScheduledFuture<?> statusNotifierHandle = scheduler.scheduleWithFixedDelay(
-				statusNotifier,
-				1,
-				(long) broadcastUpdateInterval,
-				TimeUnit.SECONDS
+				statusNotifier, 1, (long)broadcastUpdateInterval, TimeUnit.SECONDS
 			);
 		// clients
 			private static ArrayList<AtomicReference<ClientHandler>> clientsQueue = new ArrayList<AtomicReference<ClientHandler>>();
@@ -58,12 +61,14 @@ public class Server {
 		// graphics
 			private static Thread graphicInterface;
 	/* methods */
-		// mains
+		// main
 			public static void main(String[] args) {
+				// server has highest priority than ClientHandlers
 				Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 				if (start()) {
 					graphicInterface = new Thread(new ServerGUI(args));
 					graphicInterface.start();
+					// sample auction
 					addAuction(
 						Utility.stringToDate("2017/12/03 05:52:23"),
 						Utility.stringToDate("2018/12/03 05:52:23"),
@@ -75,6 +80,7 @@ public class Server {
 					while (serverStatus == ServerStatus.RUNNING) {
 						if(graphicInterface.getState() == Thread.State.TERMINATED)
 							stopServer();
+						// wait for incoming connections
 						try {
 							ClientHandler worker = new ClientHandler(serverSocket.accept(), ClientHandler.totalClients);
 							clientsQueue.add(new AtomicReference<ClientHandler>(worker));
@@ -84,6 +90,7 @@ public class Server {
 							if(!e.getMessage().equals("socket closed") && !e.getMessage().equals("socket is closed"))
 								e.printStackTrace();
 						}
+						// go to next auction is the current one is terminated
 						if(automaticProcess && currentAuctionIndex.get() != -1)
 							if(auctions.get(currentAuctionIndex.get()).get().isDealineOver())
 								nextAuction();
@@ -94,6 +101,7 @@ public class Server {
 		// connection
 			public static boolean start() {
 				serverStartDate = Utility.getStringDate();
+				// create connection point, start the scheduler; if an exception occur the server is stopped
 				try {
 					serverSocket = new ServerSocket(ServerProperties.portNumber);
 					println("Server started on " + serverStartDate);
@@ -149,6 +157,7 @@ public class Server {
 				return true;
 			}
 			public static void broadcast(Protocol.serverTags tag, Object... data) {
+				// check if tag can be broadcasted
 				if(tag == Protocol.serverTags.NOT_HIGHER || tag == Protocol.serverTags.SEND_ID) {
 					println(tag + " cannot be broadcasted");
 					return;
@@ -157,7 +166,7 @@ public class Server {
 					client.get().send(tag, data);
 			}
 		// modifiers
-			public static /*synchronized*/ void removeClient(ClientHandler myClient) {
+			public static void removeClient(ClientHandler myClient) {
 				disconnectedClients.add(new AtomicReference<ClientHandler>(myClient));
 				for(AtomicReference<ClientHandler> client : clientsQueue) {
 					if(client.get() == myClient) {
@@ -185,6 +194,8 @@ public class Server {
 				try {
 					myLock.lock();
 					*/
+					broadcast(Protocol.serverTags.WINNING_BID, getHighestBid().getKey(), getHighestBid().getValue());
+					// check if there is another auction to run, in that case, broadcast auction informations
 					if (currentAuctionIndex.get() < auctions.size()) {
 						currentAuctionIndex.getAndIncrement();
 						broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
@@ -202,23 +213,25 @@ public class Server {
 				}
 				*/
 			}
-			public static /*synchronized*/ void addBid(ClientHandler client, int amount) {
+			public static void addBid(ClientHandler client, int amount) {
 				if(!isInProgress()) {
 					println("No auction is in progress, cannot add bid from client " + client.getId());
 					return;
 				}
-				if (amount < auctions.get(currentAuctionIndex.get()).get().getHighestBid().getKey())
+				// if the bid is not higher, send an error message to the client, otherwise update
+				if(amount < auctions.get(currentAuctionIndex.get()).get().getHighestBid().getKey())
 					client.send(Protocol.serverTags.ERROR, "The bid must be higher than the actual highest bid.");
 				else {
 					auctions.get(currentAuctionIndex.get()).get().addBid(client.getClientId(), amount);
 					ServerGUI.updateHighestBid();
+					Server.broadcast(Protocol.serverTags.HIGHEST_UPDATE, amount, client.getId());
 				}
 			}
 		// getters
 			public static long getTimeRemaining() {
 				if(!isInProgress()) {
 					println("No auction is progress, cannot get time remaining");
-					return (long) 0.0;
+					return (long)0.0;
 				}
 				return Utility.difference(auctions.get(currentAuctionIndex.get()).get().getDeadline(), new Date(), TimeUnit.SECONDS);
 			}
@@ -233,21 +246,9 @@ public class Server {
 					auctions.get(currentAuctionIndex.get()).get().getHighestBid().getValue().toString()
 				};
 			}
-			public static int getConnectedClientsCount() {
-				int count = 0;
-				for(AtomicReference<ClientHandler> client : clientsQueue)
-					if(client.get().getState() != Thread.State.TERMINATED)
-						count++;
-				return count;
-			}
-			public static ArrayList<AtomicReference<ClientHandler>> getConnectedClients() {
-				ArrayList<AtomicReference<ClientHandler>> connectedClients = new ArrayList<AtomicReference<ClientHandler>>();
-				for(AtomicReference<ClientHandler> client : clientsQueue)
-					if(client.get().getState() != Thread.State.TERMINATED)
-						connectedClients.add(client);
-				return connectedClients;
-			}
-			public static /*synchronized*/ Map.Entry<Integer, Integer> getHighestBid() {
+			public static int getConnectedClientsCount() { return clientsQueue.size(); }
+			public static ArrayList<AtomicReference<ClientHandler>> getConnectedClients() { return clientsQueue; }
+			public static Map.Entry<Integer, Integer> getHighestBid() {
 				return auctions.get(currentAuctionIndex.get()).get().getHighestBid();
 			}
 			public static ServerStatus getStatus() { return serverStatus; }
@@ -255,12 +256,7 @@ public class Server {
 			public static boolean isInProgress() {
 				return (currentAuctionIndex.get() == -1 ? false : !auctions.get(currentAuctionIndex.get()).get().isDealineOver());
 			}
-			private static boolean atLeastOneClientConnected() {
-				for(AtomicReference<ClientHandler> client : clientsQueue)
-					if(client.get().getState() != Thread.State.TERMINATED)
-						return true;
-				return false;
-			}
+			private static boolean atLeastOneClientConnected() { return clientsQueue.isEmpty(); }
 		// display
 			private static void println(String data) {
 				Utility.println("[SERVER]> " + data);
