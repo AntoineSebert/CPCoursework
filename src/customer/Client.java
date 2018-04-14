@@ -17,7 +17,10 @@ import common.ServerProperties;
 import common.Utility;
 import javafx.application.Application;
 import javafx.stage.Stage;
-
+/*
+ * @author Anthony Sébert
+ * Connect to a connection point, send and receive information, update and hold a ClientGUI object.
+ */
 public class Client extends Application {
 	/* attributes */
 		// client
@@ -40,6 +43,7 @@ public class Client extends Application {
 			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 			final static Runnable connectionAttempt = new Runnable() {
 				public void run() {
+					// if the server is not responding, attempt a connection every one second
 					if(mySocket == null) {
 						println("Connection attempt");
 						try {
@@ -56,6 +60,7 @@ public class Client extends Application {
 					}
 				}
 			};
+			// running one second after initialization, calls runnable connectionAttempt every 1 second (see below)
 			final static ScheduledFuture<?> connectionAttemptHandle = scheduler.scheduleWithFixedDelay(
 				connectionAttempt,
 				1,
@@ -69,14 +74,24 @@ public class Client extends Application {
 					graphicInterface = new Thread(new ClientGUI(args));
 					graphicInterface.start();
 					//send(Protocol.clientTags.BID_SUBMIT, 100);
-					while(mainCondition)
-						receive();
+					while(mainCondition) {
+						if(mySocket != null) {
+							try {
+								Thread.sleep(1000);
+							}
+							catch(InterruptedException e) {
+								e.printStackTrace();
+							}
+							receive();
+						}
+					}
 					stopClient();
 				}
 			}
 		// graphic display
 			@Override
 			public void start(Stage primaryStage) throws Exception {
+				// start the scheduler
 				scheduler.schedule(new Runnable() {
 					public void run() { connectionAttemptHandle.cancel(true); }
 				}, (long)(36000 * connectionAttemptInterval), TimeUnit.MILLISECONDS);
@@ -84,7 +99,7 @@ public class Client extends Application {
 		// connection
 			static private boolean start() {
 				connectionDate = new Date();
-				return false;
+				return true;
 			}
 			private static void stopClient() {
 				try {
@@ -97,12 +112,13 @@ public class Client extends Application {
 			}
 			public static void send(Protocol.clientTags tag, Object... data) {
 				println("Sending " + tag + " to server :");
-				for(Object element : data)
-					println("\t" + element);
-		
 				out.println(tag);
-				for(Object element : data)
+
+				for(Object element : data) {
+					println("\t" + element);
 					out.println(element);
+				}
+				Thread.yield();
 			}
 			public static void receive() {
 				try {

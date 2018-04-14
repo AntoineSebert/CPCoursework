@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-
-/**
- * @author i
- *
+/*
+ * @author Anthony Sébert
+ * The object representation of an auction. It includes a container to manage the related bids
+ * and a member to check if the deadline for this auction is over.
  */
 public class Auction {
 	// attributes

@@ -14,7 +14,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-
+/*
+ * @author Anthony Sébert
+ * A user interface for the Server class, composed of various javaFX components.
+ * Displays current time, the time remaining, the current highest bid and the current product description,
+ * allows user to create and send a new bid, and disconnect.
+ */
 public class ClientGUI extends Application implements Runnable {
 	/* attributes */
 		// application

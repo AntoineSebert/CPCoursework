@@ -1,6 +1,3 @@
-/**
- * 
- */
 package common;
 
 import java.text.DateFormat;
@@ -16,10 +13,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-
-/**
- * @author i
- *
+/*
+ * @author Anthony Sébert
+ * A collection of functions related to the dates managing or JavaFX.
  */
 public abstract class Utility {
 	/* attributes */

@@ -21,7 +21,7 @@ import common.Utility;
 /*
  * @author Anthony Sébert
  * Set a connection point, create and manage ClientHandler objects and Auction objects,
- * update and hold a ServerGUI class, regularly notify clients about time remaining and current highest bid.
+ * update and hold a ServerGUI object, regularly notify clients about time remaining and current highest bid.
  */
 public class Server {
 	/* attributes */
@@ -260,7 +260,7 @@ public class Server {
 		// display
 			private static void println(String data) {
 				Utility.println("[SERVER]> " + data);
-				ServerGUI.printConsole("[SERVER]> " + data);
+				ServerGUI.printConsole("[SERVER_UI]> " + data);
 			}
 			private static void connectionsInfo() {
 				// do not use thread.isAlive() because of the interval between thread.start() and thread.isAlive() == true

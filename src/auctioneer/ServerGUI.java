@@ -16,7 +16,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-
+/*
+ * @author Anthony Sébert
+ * Interact with user, display the current time and the remaining time, the highest bid received and a console,
+ * allow the user to create a new auction, start/stop the server, broadcast product info and remaining time to clients.
+ */
 public class ServerGUI extends Application implements Runnable {
 	/* attributes */
 		// application
@@ -123,7 +127,7 @@ public class ServerGUI extends Application implements Runnable {
 				try {
 					super.stop();
 				}
-				catch (Exception e) {
+				catch(Exception e) {
 					e.printStackTrace();
 				}
 				println("User interface closed");

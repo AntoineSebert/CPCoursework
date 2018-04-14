@@ -1,5 +1,8 @@
 package common;
-
+/*
+ * @author Anthony Sébert
+ * Data structures for communication purposes.
+ */
 public class Protocol {
 	public static enum serverTags {
 		// server status

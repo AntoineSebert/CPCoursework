@@ -9,7 +9,10 @@ import java.util.Date;
 
 import common.Protocol;
 import common.Utility;
-
+/*
+ * @author Anthony Sébert
+ * Holds and manage server-side client data, talk with client.
+ */
 public class ClientHandler extends Thread {
 	/* attributes */
 		// static
@@ -46,6 +49,7 @@ public class ClientHandler extends Thread {
 					receive();
 			}
 			public void send(Protocol.serverTags tag, Object... data) {
+				// check is there is an auction in progress; some tags can be unavailable
 				if(!Server.isInProgress() && (
 						tag == Protocol.serverTags.PRODUCT_DESCRIPTION
 						|| tag == Protocol.serverTags.TIME_REMAINING
@@ -57,12 +61,12 @@ public class ClientHandler extends Thread {
 				}
 		
 				println("Sending " + tag + " to client " + id + ':');
-				for(Object element : data)
-					println("\t" + element);
-		
 				out.println(tag);
-				for(Object element : data)
+
+				for(Object element : data) {
+					println("\t" + element);
 					out.println(element);
+				}
 				yield();
 			}
 			private void receive() {
