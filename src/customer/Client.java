@@ -172,6 +172,7 @@ public class Client extends Application {
 						case HIGHEST_UPDATE:
 							currentHighestBidAmount = Integer.parseInt(in.readLine());
 							currentHighestBidId = Integer.parseInt(in.readLine());
+							ui.updateHighestBid(currentHighestBidId, currentHighestBidAmount);
 							println("Highest bid is " + currentHighestBidAmount + " from client " + currentHighestBidId );
 							break;
 						case CLOSE_BIDDING:

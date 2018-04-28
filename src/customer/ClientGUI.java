@@ -83,13 +83,13 @@ public class ClientGUI extends Application implements Runnable {
 				// RIGHT
 					highestBidPanel.getChildren().addAll(
 						Utility.createText(
-							"Highest bid" +
+							"Highest bid\n" +
 							"Client id: " + ""
 							+ "\namount: " + "" + '\n',
 							350, 15.0, TextAlignment.RIGHT
 						)
 					);
-					root.setCenter(highestBidPanel);
+					root.setRight(highestBidPanel);
 				// BOTTOM
 					actionsPanel.getChildren().addAll(
 						Utility.createButton("Disconnect", new EventHandler<ActionEvent>() {
@@ -131,7 +131,9 @@ public class ClientGUI extends Application implements Runnable {
 				);
 			}
 			public void updateHighestBid(int clientIndex, int bid) {
-				
+				((Text)highestBidPanel.getChildren().get(0)).setText(
+					"Highest bid" + "Client id: " + String.valueOf(clientIndex) + "\namount: " + String.valueOf(bid) + '\n'
+				);
 			}
 		// display
 			private void println(String data) {
