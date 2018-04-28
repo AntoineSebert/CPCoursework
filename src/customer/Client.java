@@ -25,6 +25,7 @@ public class Client extends Application {
 	/* attributes */
 		// client
 			static private boolean mainCondition = true;
+			static private ClientGUI ui = new ClientGUI();
 		// server communication
 			static private Date connectionDate;
 			static private Socket mySocket;
@@ -141,7 +142,7 @@ public class Client extends Application {
 							break;
 						case TIME_REMAINING:
 							timeRemaining = Long.parseLong(in.readLine());
-							ClientGUI.updateTimeRemaining(timeRemaining);
+							ui.updateTimeRemaining(timeRemaining);
 							println("Time remaining : " + timeRemaining);
 							break;
 						case HIGHEST_UPDATE:
@@ -161,8 +162,7 @@ public class Client extends Application {
 							break;
 						case CLOSE_CONNECTION:
 							println("Closing connection with the server");
-							cleanAuctionAttributes();
-							mySocket.close();
+							disconnect();
 							break;
 						case ERROR:
 							println("Error : " + in.readLine());
@@ -174,6 +174,19 @@ public class Client extends Application {
 				}
 				catch(IOException e) {
 					e.printStackTrace();
+				}
+			}
+			public static void disconnect() {
+				cleanAuctionAttributes();
+				if(mySocket != null) {
+					if(!mySocket.isClosed()) {
+						try {
+							mySocket.close();
+						}
+						catch(IOException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 		// modifiers

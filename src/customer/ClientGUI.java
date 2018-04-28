@@ -2,6 +2,7 @@ package customer;
 
 import auctioneer.Server;
 import common.Protocol;
+import common.ServerStatus;
 import common.Utility;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -25,9 +27,10 @@ public class ClientGUI extends Application implements Runnable {
 		// application
 			private String[] args;
 		// graphic elements
-			private static BorderPane root;
-			private static VBox bidPanel = new VBox();
-			private static HBox topbar = new HBox();
+			private BorderPane root;
+			private VBox bidPanel = new VBox();
+			private HBox topbar = new HBox();
+			private TilePane actionsPanel = new TilePane();
 	/* members */
 		// constructor
 			public ClientGUI() {}
@@ -72,7 +75,15 @@ public class ClientGUI extends Application implements Runnable {
 				// RIGHT
 					// value of the highest bid received to date
 				// BOTTOM
-					// disconnect
+					actionsPanel.getChildren().addAll(
+						Utility.createButton("Disconnect", new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								Client.disconnect();
+							}
+						})
+					);
+					root.setBottom(actionsPanel);
 				primaryStage.setScene(new Scene(root, 1200, 600));
 				primaryStage.show();
 			}
@@ -88,7 +99,7 @@ public class ClientGUI extends Application implements Runnable {
 				println("User interface closed");
 			}
 		// client-side events
-			public static void updateTimeRemaining(long timeRemaining) {
+			public void updateTimeRemaining(long timeRemaining) {
 				((Text)root.getTop()).setText(
 					"time remaining: hours: " + String.valueOf(Math.floor(timeRemaining / 360))
 					+ " minutes: " + String.valueOf(Math.floor(timeRemaining / 60))
@@ -96,7 +107,7 @@ public class ClientGUI extends Application implements Runnable {
 				);
 			}
 		// display
-			private static void println(String data) {
+			private void println(String data) {
 				Utility.println("[CLIENT_UI]> " + data);
 			}
 }

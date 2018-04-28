@@ -59,7 +59,7 @@ public class ClientHandler extends Thread {
 					println("No auction in progress, cannot send " + tag);
 					return;
 				}
-		
+
 				println("Sending " + tag + " to client " + id + ':');
 				out.println(tag);
 

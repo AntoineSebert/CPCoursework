@@ -194,7 +194,6 @@ public class Server {
 				try {
 					myLock.lock();
 					*/
-					broadcast(Protocol.serverTags.WINNING_BID, getHighestBid().getKey(), getHighestBid().getValue());
 					// check if there is another auction to run, in that case, broadcast auction informations
 					if (currentAuctionIndex.get() < auctions.size()) {
 						currentAuctionIndex.getAndIncrement();
@@ -206,6 +205,7 @@ public class Server {
 					}
 					else
 						println("There is no next auction");
+					broadcast(Protocol.serverTags.WINNING_BID, getHighestBid().getKey(), getHighestBid().getValue());
 				/*
 				}
 				finally {

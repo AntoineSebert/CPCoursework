@@ -48,13 +48,13 @@ public abstract class Utility {
 			public static TextField createEditableTextField(String hint) {
 				TextField newTextField = new TextField();
 				newTextField.setPromptText(hint);
-		
+
 				return newTextField;
 			}
 			public static Button createButton(String text, EventHandler<ActionEvent> action) {
 				Button newButton = new Button(text);
 				newButton.setOnAction(action);
-		
+
 				return newButton;
 			}
 			public static Text createText(String text, int width, double fontSize, TextAlignment alignment) {
@@ -62,7 +62,7 @@ public abstract class Utility {
 				newText.setFont(new Font(fontSize));
 				newText.setWrappingWidth(width);
 				newText.setTextAlignment(alignment);
-		
+
 				return newText;
 			}
 }
