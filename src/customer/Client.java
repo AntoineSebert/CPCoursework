@@ -25,7 +25,7 @@ public class Client extends Application {
 	/* attributes */
 		// client
 			static private boolean mainCondition = true;
-			static private ClientGUI ui = new ClientGUI();
+			static private ClientGUI ui;
 		// server communication
 			static private Date connectionDate;
 			static private Socket mySocket;
@@ -40,8 +40,14 @@ public class Client extends Application {
 		// graphics
 			static private Thread graphicInterface;
 		// background task
-			private static double connectionAttemptInterval = 1.0;
-			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+			private static double connectionAttemptInterval = 1.0, timeUpdateInterval = 1.0;
+			private final static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+			final static Runnable timeUpdate = new Runnable() {
+				public void run() {
+					// update GUI time and time remaining
+					ui.updateTime(timeRemaining);
+				}
+			};
 			final static Runnable connectionAttempt = new Runnable() {
 				public void run() {
 					// if the server is not responding, attempt a connection every one second
@@ -61,18 +67,25 @@ public class Client extends Application {
 					}
 				}
 			};
-			// running one second after initialization, calls runnable connectionAttempt every 1 second (see below)
-			final static ScheduledFuture<?> connectionAttemptHandle = scheduler.scheduleWithFixedDelay(
+			// running one second after initialization, calls runnables every 1 second (see above)
+			final static ScheduledFuture<?> connectionAttemptHandler = scheduler.scheduleWithFixedDelay(
 				connectionAttempt,
 				1,
 				(long) connectionAttemptInterval,
+				TimeUnit.SECONDS
+			);
+			final static ScheduledFuture<?> timeUpdateHandler = scheduler.scheduleWithFixedDelay(
+					timeUpdate,
+				1,
+				(long) timeUpdateInterval,
 				TimeUnit.SECONDS
 			);
 	/* members */
 		// main
 			public static void main(String[] args) {
 				if(start()) {
-					graphicInterface = new Thread(new ClientGUI(args));
+					ui  = new ClientGUI(args);
+					graphicInterface = new Thread(ui);
 					graphicInterface.start();
 					//send(Protocol.clientTags.BID_SUBMIT, 100);
 					while(mainCondition) {
@@ -92,10 +105,13 @@ public class Client extends Application {
 		// graphic display
 			@Override
 			public void start(Stage primaryStage) throws Exception {
-				// start the scheduler
+				// start the schedulers
 				scheduler.schedule(new Runnable() {
-					public void run() { connectionAttemptHandle.cancel(true); }
+					public void run() { connectionAttemptHandler.cancel(true); }
 				}, (long)(36000 * connectionAttemptInterval), TimeUnit.MILLISECONDS);
+				scheduler.schedule(new Runnable() {
+					public void run() { timeUpdateHandler.cancel(true); }
+				}, (long)(36000 * timeUpdateInterval), TimeUnit.MILLISECONDS);
 			}
 		// connection
 			static private boolean start() {
@@ -103,6 +119,12 @@ public class Client extends Application {
 				return true;
 			}
 			private static void stopClient() {
+				try {
+					graphicInterface.join();
+				}
+				catch(InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				try {
 					out.println(Protocol.clientTags.CLOSE_CONNECTION);
 					mySocket.close();
@@ -138,11 +160,13 @@ public class Client extends Application {
 							break;
 						case PRODUCT_DESCRIPTION:
 							println("The product is :");
-							println('\t' + in.readLine() + "\n\t\t\t" +  in.readLine() + "\n\t\t\t" +  in.readLine() + '\n');
+							String name = in.readLine(), description = in.readLine();
+							println('\t' + name + "\n\t\t\t" + description + "\n\t\t\t" + in.readLine() + '\n');
+							ui.updateProductInfo(name, description);
 							break;
 						case TIME_REMAINING:
 							timeRemaining = Long.parseLong(in.readLine());
-							ui.updateTimeRemaining(timeRemaining);
+							ui.updateTime(timeRemaining);
 							println("Time remaining : " + timeRemaining);
 							break;
 						case HIGHEST_UPDATE:

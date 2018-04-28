@@ -25,12 +25,14 @@ import javafx.stage.Stage;
 public class ClientGUI extends Application implements Runnable {
 	/* attributes */
 		// application
-			private String[] args;
+			private static String[] args;
 		// graphic elements
-			private BorderPane root;
-			private VBox bidPanel = new VBox();
-			private HBox topbar = new HBox();
-			private TilePane actionsPanel = new TilePane();
+			private static BorderPane root;
+			private static VBox bidPanel = new VBox();
+			private static VBox highestBidPanel = new VBox();
+			private static HBox topbar = new HBox();
+			private static TilePane actionsPanel = new TilePane();
+			private static VBox productPanel = new VBox();
 	/* members */
 		// constructor
 			public ClientGUI() {}
@@ -49,8 +51,7 @@ public class ClientGUI extends Application implements Runnable {
 						Utility.createText(
 							" hours: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 360))
 							+ " minutes: " + String.valueOf(Math.floor(Server.getTimeRemaining() / 60))
-							+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60))
-							+ '\n',
+							+ " seconds: " + String.valueOf(Math.floor(Server.getTimeRemaining() % 60)) + '\n',
 							350, 15.0, TextAlignment.LEFT
 						)
 					);
@@ -71,9 +72,24 @@ public class ClientGUI extends Application implements Runnable {
 					);
 					root.setLeft(bidPanel);
 				// CENTER
-					// product info
+					productPanel.getChildren().addAll(
+						Utility.createText(
+							"product name: " + ""
+							+ "\nproduct description: " + "" + '\n',
+							350, 15.0, TextAlignment.LEFT
+						)
+					);
+					root.setCenter(productPanel);
 				// RIGHT
-					// value of the highest bid received to date
+					highestBidPanel.getChildren().addAll(
+						Utility.createText(
+							"Highest bid" +
+							"Client id: " + ""
+							+ "\namount: " + "" + '\n',
+							350, 15.0, TextAlignment.RIGHT
+						)
+					);
+					root.setCenter(highestBidPanel);
 				// BOTTOM
 					actionsPanel.getChildren().addAll(
 						Utility.createButton("Disconnect", new EventHandler<ActionEvent>() {
@@ -86,6 +102,7 @@ public class ClientGUI extends Application implements Runnable {
 					root.setBottom(actionsPanel);
 				primaryStage.setScene(new Scene(root, 1200, 600));
 				primaryStage.show();
+				println(String.valueOf(topbar.getChildren().isEmpty()));
 			}
 			@Override
 			public void stop() {
@@ -93,18 +110,28 @@ public class ClientGUI extends Application implements Runnable {
 				try {
 					super.stop();
 				}
-				catch (Exception e) {
+				catch(Exception e) {
 					e.printStackTrace();
 				}
 				println("User interface closed");
 			}
 		// client-side events
-			public void updateTimeRemaining(long timeRemaining) {
-				((Text)root.getTop()).setText(
+			public void updateTime(long timeRemaining) {
+				((Text)topbar.getChildren().get(0)).setText("current time: " + Utility.getStringDate() + '\n');
+				((Text)topbar.getChildren().get(1)).setText(
 					"time remaining: hours: " + String.valueOf(Math.floor(timeRemaining / 360))
 					+ " minutes: " + String.valueOf(Math.floor(timeRemaining / 60))
 					+ " seconds: " + String.valueOf(Math.floor(timeRemaining % 60))
+					+ '\n'
 				);
+			}
+			public void updateProductInfo(String name, String description) {
+				((Text)actionsPanel.getChildren().get(0)).setText(
+					"product name: " + name + "\nproduct description: " + description + "\n"
+				);
+			}
+			public void updateHighestBid(int clientIndex, int bid) {
+				
 			}
 		// display
 			private void println(String data) {
