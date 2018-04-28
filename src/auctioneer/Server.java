@@ -176,42 +176,22 @@ public class Server {
 				}
 			}
 			public static void addAuction(Date begin, Date end, String name, String description, int startPrice) {
-				/*
-				try {
-					myLock.lock();
-				*/
-					auctions.add(new AtomicReference<Auction>(new Auction(begin, end, name, description, startPrice)));
-					println("New auction added to queue");
-				/*
-				}
-				finally {
-					myLock.unlock();
-				}
-				*/
+				auctions.add(new AtomicReference<Auction>(new Auction(begin, end, name, description, startPrice)));
+				println("New auction added to queue");
 			}
 			private static void nextAuction() {
-				/*
-				try {
-					myLock.lock();
-					*/
-					// check if there is another auction to run, in that case, broadcast auction informations
-					if (currentAuctionIndex.get() < auctions.size()) {
-						currentAuctionIndex.getAndIncrement();
-						broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
-						broadcast(
-							Protocol.serverTags.TIME_REMAINING,
-							Utility.difference(new Date(), auctions.get(currentAuctionIndex.get()).get().getDeadline(), TimeUnit.SECONDS)
-						);
-					}
-					else
-						println("There is no next auction");
-					broadcast(Protocol.serverTags.WINNING_BID, getHighestBid().getKey(), getHighestBid().getValue());
-				/*
+				// check if there is another auction to run, in that case, broadcast auction informations
+				if (currentAuctionIndex.get() < auctions.size()) {
+					currentAuctionIndex.getAndIncrement();
+					broadcast(Protocol.serverTags.PRODUCT_DESCRIPTION, (Object[])getProductInfo());
+					broadcast(
+						Protocol.serverTags.TIME_REMAINING,
+						Utility.difference(new Date(), auctions.get(currentAuctionIndex.get()).get().getDeadline(), TimeUnit.SECONDS)
+					);
 				}
-				finally {
-					myLock.unlock();
-				}
-				*/
+				else
+					println("There is no next auction");
+				broadcast(Protocol.serverTags.WINNING_BID, getHighestBid().getKey(), getHighestBid().getValue());
 			}
 			public static void addBid(ClientHandler client, int amount) {
 				if(!isInProgress()) {
